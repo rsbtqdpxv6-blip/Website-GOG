@@ -57,11 +57,31 @@ Module.onRuntimeInitialized = function () {
     // DEBUG: show what we actually got
     console.log("Module exports:", Object.keys(Module));
 };
+
+<script>
+let Module;
+
+const SNES = createModule ? createModule() : null;
+</script>
+    
 </script>
 
 <script src="snes.js"></script>
 
 <script>
+
+   <script>
+setTimeout(() => {
+    console.log("window keys:", Object.keys(window));
+
+    for (const k of Object.keys(window)) {
+        if (k.toLowerCase().includes("snes") || k.toLowerCase().includes("module")) {
+            console.log("FOUND:", k, window[k]);
+        }
+    }
+}, 1000);
+</script>
+    
 /* =========================
    HELPERS
    ========================= */
