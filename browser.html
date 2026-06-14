@@ -3,58 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GitHub Hosted HTML Browser</title>
+    <title>Independent HTML Web Dashboard</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; height: 100vh; display: flex; flex-direction: column; background: #202124; color: white; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; height: 100vh; display: flex; flex-direction: column; background: #1c1c1e; color: #fff; }
         
-        /* Navigation UI */
-        .navbar { display: flex; padding: 10px; background: #35363a; gap: 10px; align-items: center; }
-        .address-bar { flex-grow: 1; padding: 10px 16px; border: none; border-radius: 24px; font-size: 14px; background: #202124; color: white; }
-        .address-bar:focus { outline: 2px solid #8ab4f8; }
-        .btn { padding: 10px 20px; background: #1a73e8; color: white; border: none; border-radius: 24px; cursor: pointer; font-weight: 500; }
-        .btn:hover { background: #1557b0; }
+        /* Minimal Address Bar */
+        .nav-bar { display: flex; padding: 12px; background: #2c2c2e; gap: 10px; align-items: center; border-bottom: 1px solid #3a3a3c; }
+        .address-input { flex-grow: 1; padding: 10px 16px; border: none; border-radius: 20px; font-size: 14px; background: #1c1c1e; color: #fff; }
+        .address-input:focus { outline: 2px solid #0a84ff; }
+        .action-btn { padding: 10px 24px; background: #0a84ff; color: #fff; border: none; border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 14px; transition: background 0.2s; }
+        .action-btn:hover { background: #0070e0; }
         
-        /* Web Viewport */
-        .viewport-frame { flex-grow: 1; border: none; background: white; }
+        /* Sandbox Viewport */
+        .frame-canvas { flex-grow: 1; border: none; background: #ffffff; }
     </style>
 </head>
 <body>
 
-    <div class="navbar">
-        <input type="text" id="urlBar" class="address-bar" value="https://example.com" onkeydown="if(event.key === 'Enter') browseToSite()">
-        <button class="btn" onclick="browseToSite()">Go</button>
+    <div class="nav-bar">
+        <input type="text" id="targetUrl" class="address-input" value="https://example.com" placeholder="Type a website URL and press Enter..." onkeydown="if(event.key === 'Enter') requestPage()">
+        <button class="action-btn" onclick="requestPage()">Launch</button>
     </div>
 
-    <!-- The actual webpage displays inside this canvas -->
-    <iframe id="browserWindow" class="viewport-frame"></iframe>
+    <!-- Isolated Sandbox Window -->
+    <iframe id="viewCanvas" class="frame-canvas" sandbox="allow-scripts allow-forms allow-same-origin"></iframe>
 
     <script>
-        // Setup internal environment pathing safely on GitHub Pages
-        const scopePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+        async function requestPage() {
+            let url = document.getElementById('targetUrl').value.trim();
+            const canvas = document.getElementById('viewCanvas');
 
-        // Register the background gateway engine
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js', { scope: scopePath })
-            .then(() => console.log("Engine Active."))
-            .catch(err => console.error("Activation Failed:", err));
-        }
+            if (!url) return;
+            if (!/^https?:\/\//i.test(url)) { url = 'https://' + url; }
+            document.getElementById('targetUrl').value = url;
 
-        function browseToSite() {
-            let targetUrl = document.getElementById('urlBar').value.trim();
-            
-            // Automatically patch links missing standard protocol prefixes
-            if (!/^https?:\/\//i.test(targetUrl)) {
-                targetUrl = 'https://' + targetUrl;
+            try {
+                // Uses an open text-stream protocol to pull raw website code straight into your local browser storage
+                const targetResponse = await fetch(`https://allorigins.win{encodeURIComponent(url)}`);
+                let htmlContent = await targetResponse.text();
+
+                // Inject a base target tag so images/stylesheets load correctly from the original host
+                const baseTag = `<base href="${url}/" target="_self">`;
+                htmlContent = htmlContent.replace('<head>', `<head>${baseTag}`);
+
+                // Strip standard header payload elements locally out of the text string
+                const sanitizedBlob = new Blob([htmlContent], { type: 'text/html' });
+                canvas.src = URL.createObjectURL(sanitizedBlob);
+
+            } catch (err) {
+                // Fallback layout if the site has strict network security protections
+                canvas.srcdoc = `
+                    <div style="font-family:sans-serif; padding:40px; color:#333; text-align:center;">
+                        <h2>Loading Frame Security Restrictions</h2>
+                        <p>This site blocks direct embedding. Try testing with simpler text sites (e.g., <b>wikipedia.org</b> or <b>example.com</b>).</p>
+                        <small style="color:#999;">Error Details: ${err.message}</small>
+                    </div>`;
             }
-            document.getElementById('urlBar').value = targetUrl;
-            
-            // Pass the target directly through the secure service worker layout path
-            document.getElementById('browserWindow').src = window.location.origin + scopePath + 'proxy-gateway/' + encodeURIComponent(targetUrl);
         }
 
-        // Run default site configuration upon launching layout
-        window.onload = () => { setTimeout(browseToSite, 500); };
+        // Auto-load home screen
+        window.onload = requestPage;
     </script>
 
 </body>
