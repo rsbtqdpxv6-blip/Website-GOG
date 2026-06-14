@@ -128,7 +128,7 @@
     try {
         systemLang = Intl.DateTimeFormat().resolvedOptions().locale;
     } catch(e) {} //Ignore
-    if ((typeof window.EJS_language === "string" && window.EJS_language !== "en-US") || (systemLang && window.EJS_disableAutoLang !== false)) {
+    if ((typeof window.EJS_language === "string" && window.EJS_language !== "en-CA") || (systemLang && window.EJS_disableAutoLang !== false)) {
         const language = window.EJS_language || systemLang;
         try {
             let path;
