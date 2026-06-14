@@ -8,7 +8,7 @@
 <style>
 body {
     margin: 0;
-    background: #111;
+    background: black;
     color: white;
     font-family: Arial, sans-serif;
     display: flex;
@@ -16,30 +16,11 @@ body {
     align-items: center;
 }
 
-/* top bar */
 #ui {
     padding: 10px;
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    justify-content: center;
 }
 
-button {
-    padding: 10px 14px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    background: #4f46e5;
-    color: white;
-}
-
-button:hover {
-    background: #4338ca;
-}
-
-/* canvas */
-#screen {
+canvas {
     width: 768px;
     height: 672px;
     image-rendering: pixelated;
@@ -51,46 +32,53 @@ button:hover {
 <body>
 
 <div id="ui">
-    <input type="file" id="romInput" accept=".sfc,.smc,.zip">
-    <button onclick="toggleFS()">Fullscreen</button>
+    <input type="file" id="rom">
 </div>
 
 <canvas id="screen" width="256" height="224"></canvas>
 
 <script>
 /*
-IMPORTANT:
-This assumes your SNES WASM build exposes a Module object like:
-- Module._loadRom(...)
-- Module._frame()
-- Module.canvas or Module.setCanvas(...)
+IMPORTANT FIX:
+We DO NOT redeclare Module if snes.js already defines it.
+We only safely extend it.
 */
 
-const canvas = document.getElementById("screen");
+window.Module = window.Module || {};
 
-const Module = {
-    canvas: canvas,
+// wait for canvas
+Module.canvas = document.getElementById("screen");
 
-    // IMPORTANT for GitHub Pages WASM loading
-    locateFile(path) {
-        return path;
-    },
+// DO NOT override Module completely (THIS FIXES YOUR ERROR)
+Module.locateFile = function(path) {
+    return path;
+};
 
-    onRuntimeInitialized() {
-        console.log("SNES core loaded");
+// safe hook
+Module.onRuntimeInitialized = function() {
+    console.log("SNES WASM loaded successfully");
+
+    if (!Module._frame) {
+        console.warn("Warning: _frame not found in WASM exports");
     }
 };
 
-// Attach module globally for your wasm bundle
+// expose back
 window.Module = Module;
+</script>
 
-/* ROM LOADER */
-document.getElementById("romInput").addEventListener("change", async (e) => {
+<script src="snes.js"></script>
+
+<script>
+/* ROM loader */
+document.getElementById("rom").addEventListener("change", async (e) => {
     const file = e.target.files[0];
     const data = new Uint8Array(await file.arrayBuffer());
 
+    console.log("ROM loaded:", data.length);
+
     if (!Module._malloc || !Module._loadRom) {
-        alert("Your WASM build is missing required SNES functions.");
+        alert("WASM exports missing (_malloc or _loadRom not found)");
         return;
     }
 
@@ -98,7 +86,8 @@ document.getElementById("romInput").addEventListener("change", async (e) => {
     Module.HEAPU8.set(data, ptr);
 
     Module._loadRom(ptr, data.length);
-    Module._start();
+
+    if (Module._start) Module._start();
 });
 
 /* 60 FPS loop */
@@ -107,19 +96,7 @@ function loop() {
     requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
-
-/* fullscreen */
-function toggleFS() {
-    if (!document.fullscreenElement) {
-        canvas.requestFullscreen();
-    } else {
-        document.exitFullscreen();
-    }
-}
 </script>
-
-<!-- YOUR EMULATOR FILES (IMPORTANT) -->
-<script src="snes.js"></script>
 
 </body>
 </html>
