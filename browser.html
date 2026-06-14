@@ -3,89 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Standalone HTML Engine</title>
+    <title>Educational Hub</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; height: 100vh; display: flex; flex-direction: column; background: #1c1c1e; color: #fff; }
-        
-        /* Navigation Controls Bar */
-        .controls { display: flex; padding: 12px; background: #2c2c2e; gap: 10px; align-items: center; border-bottom: 1px solid #3a3a3c; }
-        .address-field { flex-grow: 1; padding: 10px 16px; border: none; border-radius: 20px; font-size: 14px; background: #1c1c1e; color: #fff; }
-        .address-field:focus { outline: 2px solid #0a84ff; }
-        .nav-btn { padding: 10px 24px; background: #0a84ff; color: #fff; border: none; border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 14px; }
-        .nav-btn:hover { background: #0070e0; }
-        
-        /* Viewport Frame Canvas */
-        .view-frame { flex-grow: 1; border: none; background: #ffffff; }
+        .navbar { display: flex; padding: 12px; background: #2c2c2e; gap: 10px; align-items: center; border-bottom: 1px solid #3a3a3c; }
+        .address-bar { flex-grow: 1; padding: 10px 16px; border: none; border-radius: 20px; font-size: 14px; background: #1c1c1e; color: #fff; }
+        .address-bar:focus { outline: 2px solid #0a84ff; }
+        .btn { padding: 10px 24px; background: #0a84ff; color: #fff; border: none; border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 14px; }
+        .btn:hover { background: #0070e0; }
+        .viewport { flex-grow: 1; border: none; background: #ffffff; }
     </style>
 </head>
 <body>
 
-    <div class="controls">
-        <input type="text" id="destinationUrl" class="address-field" value="https://example.com" placeholder="Type a domain name and press Enter...">
-        <button class="nav-btn" onclick="executeNavigation()">Launch</button>
+    <div class="navbar">
+        <input type="text" id="urlInput" class="address-bar" value="wikipedia.org" placeholder="Type a site name...">
+        <button class="btn" onclick="launchSite()">Go</button>
     </div>
 
-    <!-- The actual website canvas container -->
-    <iframe id="displayCanvas" class="view-frame" sandbox="allow-scripts allow-forms allow-same-origin"></iframe>
+    <iframe id="viewport" class="viewport"></iframe>
 
     <script>
-        // Set up the event listener for the Enter key immediately
-        document.getElementById('destinationUrl').addEventListener('keydown', function(event) {
-            if (event.key === 'Enter') {
-                executeNavigation();
-            }
-        });
+        function launchSite() {
+            let target = document.getElementById('urlInput').value.trim();
+            if (!target) return;
 
-        async function executeNavigation() {
-            let url = document.getElementById('destinationUrl').value.trim();
-            const canvas = document.getElementById('displayCanvas');
+            // Strip any protocol prefixes if the user types them manually
+            target = target.replace(/^https?:\/\//i, '');
+            document.getElementById('urlInput').value = target;
 
-            if (!url) return;
-            
-            // Format links that do not have the http protocol prefix
-            if (!/^https?:\/\//i.test(url)) { 
-                url = 'https://' + url; 
-            }
-            document.getElementById('destinationUrl').value = url;
+            // This funnels the request entirely through Google's unblockable developer cache
+            const googleProxy = "https://googleusercontent.com";
+            const finalUrl = "https://" + target;
 
-            try {
-                // Fetch the webpage code text using an open mirror gateway
-                const feedResponse = await fetch(`https://allorigins.win{encodeURIComponent(url)}`);
-                if (!feedResponse.ok) throw new Error('Network bridge failed');
-                
-                let textBody = await feedResponse.text();
-
-                // Inject a base tag into the head so external links, pictures, and styles match the original domain
-                const assetBaseTag = `<base href="${url}/" target="_self">`;
-                
-                if (textBody.includes('<head>')) {
-                    textBody = textBody.replace('<head>', `<head>${assetBaseTag}`);
-                } else if (textBody.includes('<html>')) {
-                    textBody = textBody.replace('<html>', `<html><head>${assetBaseTag}</head>`);
-                } else {
-                    textBody = assetBaseTag + textBody;
-                }
-
-                // Convert the completely cleaned text string into a browser-readable blob payload
-                const resourceBlob = new Blob([textBody], { type: 'text/html' });
-                canvas.src = URL.createObjectURL(resourceBlob);
-
-            } catch (networkError) {
-                // Fallback template design if a site has intense firewalls 
-                canvas.srcdoc = `
-                    <div style="font-family: system-ui, sans-serif; padding: 50px; text-align: center; color: #333;">
-                        <h2 style="color: #ff3b30;">Frame Integration Restricted</h2>
-                        <p style="margin-top: 10px;">This domain utilizes heavy security headers that block client-side reading.</p>
-                        <p style="color: #666; font-size: 13px; margin-top: 5px;">Error: ${networkError.message}</p>
-                        <hr style="margin: 20px auto; width: 50%; border: 0; border-top: 1px solid #eee;">
-                        <p>Try testing with simpler database sites like <b>wikipedia.org</b> or <b>example.com</b>.</p>
-                    </div>`;
-            }
+            // Inject the link straight into the frame layout
+            document.getElementById('viewport').src = googleProxy + encodeURIComponent(finalUrl);
         }
 
-        // Run navigation when the dashboard launches
-        window.onload = executeNavigation;
+        window.onload = launchSite;
     </script>
 
 </body>
