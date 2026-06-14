@@ -51,6 +51,7 @@
   <script>
     let currentRom = "";
     let emulatorReady = false;
+    let emulatorScriptLoaded = false;
 
     function storageKey() {
       return "snes_save_" + currentRom;
@@ -85,10 +86,12 @@
         }
       };
 
-      const script = document.createElement("script");
-      script.src = "emulatorjs/data/loader.js";
-      document.body.appendChild(script);
-    }
+      if (!emulatorScriptLoaded) {
+         const script = document.createElement("script");
+         script.src = "emulatorjs/data/loader.js";
+         document.body.appendChild(script);
+         emulatorScriptLoaded = true;
+}
 
     function loadROM() {
       startEmu(document.getElementById("romSelect").value);
