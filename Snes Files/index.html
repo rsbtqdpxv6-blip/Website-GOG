@@ -1,140 +1,92 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SNES Emulator</title>
+  <meta charset="UTF-8">
+  <title>SNES EmulatorJS - ROM Selector</title>
+  <style>
+    body {
+      margin: 0;
+      background: #111;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
 
-<style>
-body {
-    margin: 0;
-    background: black;
-    color: white;
-    font-family: Arial;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
+    #topbar {
+      padding: 10px;
+      background: #222;
+    }
 
-canvas {
-    width: 768px;
-    height: 672px;
-    image-rendering: pixelated;
-    background: black;
-    margin-top: 10px;
-}
+    select, button {
+      padding: 8px;
+      margin: 5px;
+      font-size: 14px;
+    }
 
-#ui {
-    padding: 10px;
-}
-</style>
+    #game {
+      width: 100vw;
+      height: calc(100vh - 60px);
+    }
+  </style>
 </head>
 
 <body>
 
-<div id="ui">
-    <input type="file" id="rom">
-</div>
+  <div id="topbar">
+    <select id="romSelect">
+      <option value="roms/super-mario-world.sfc">Super Mario World</option>
+      <option value="roms/donkey-kong-country.sfc">Donkey Kong Country</option>
+      <option value="roms/zelda-alttp.sfc">Zelda: A Link to the Past</option>
+    </select>
 
-<canvas id="screen" width="256" height="224"></canvas>
+    <button onclick="loadROM()">Load Game</button>
+    <button onclick="goFullscreen()">Fullscreen</button>
+  </div>
 
-<script>
-/* =========================
-   SAFE EMSCRIPTEN MODULE
-   ========================= */
+  <div id="game"></div>
 
-window.Module = window.Module || {};
+  <script>
+    let currentGame = "roms/super-mario-world.sfc";
 
-Module.canvas = document.getElementById("screen");
+    function startEmulator(rom) {
+      document.getElementById("game").innerHTML = "";
 
-Module.locateFile = function(path) {
-    return "./" + path;
-};
+      EJS_player = "#game";
+      EJS_core = "snes";
+      EJS_gameUrl = rom;
+      EJS_pathtodata = "https://cdn.emulatorjs.org/latest/data/";
+      EJS_startOnLoaded = true;
+      EJS_fullscreenOnLoaded = false;
 
-Module.onRuntimeInitialized = function () {
-    console.log("SNES WASM LOADED");
-
-    // DEBUG: show what we actually got
-    console.log("Module exports:", Object.keys(Module));
-};
-
-<script>
-let Module;
-
-const SNES = createModule ? createModule() : null;
-</script>
-    
-</script>
-
-<script src="snes.js"></script>
-
-<script>
-
-   <script>
-setTimeout(() => {
-    console.log("window keys:", Object.keys(window));
-
-    for (const k of Object.keys(window)) {
-        if (k.toLowerCase().includes("snes") || k.toLowerCase().includes("module")) {
-            console.log("FOUND:", k, window[k]);
-        }
-    }
-}, 1000);
-</script>
-    
-/* =========================
-   HELPERS
-   ========================= */
-
-function call(name, args = []) {
-    try {
-        if (Module.ccall) {
-            return Module.ccall(name, null, [], args);
-        }
-    } catch (e) {
-        // ignore missing functions
-    }
-}
-
-/* =========================
-   ROM LOADER
-   ========================= */
-
-document.getElementById("rom").addEventListener("change", async (e) => {
-    const rom = new Uint8Array(await e.target.files[0].arrayBuffer());
-
-    console.log("ROM loaded:", rom.length);
-
-    if (!Module._malloc) {
-        alert("WASM not ready or invalid build");
-        return;
+      const script = document.createElement("script");
+      script.src = "https://cdn.emulatorjs.org/latest/data/loader.js";
+      document.body.appendChild(script);
     }
 
-    const ptr = Module._malloc(rom.length);
-    Module.HEAPU8.set(rom, ptr);
+    function loadROM() {
+      currentGame = document.getElementById("romSelect").value;
+      startEmulator(currentGame);
+    }
 
-    // TRY COMMON SNES9X FUNCTION NAMES
-    call("load_rom", [ptr, rom.length]);
-    call("loadROM", [ptr, rom.length]);
-    call("snes_load_rom", [ptr, rom.length]);
-    call("load_game", [ptr, rom.length]);
-});
+    function goFullscreen() {
+      const elem = document.getElementById("game");
 
-/* =========================
-   60 FPS LOOP
-   ========================= */
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+      } else if (elem.webkitRequestFullscreen) {
+        elem.webkitRequestFullscreen();
+      } else if (elem.msRequestFullscreen) {
+        elem.msRequestFullscreen();
+      }
+    }
 
-function frameLoop() {
-    call("run_frame");
-    call("runFrame");
-    call("snes_run");
-    call("frame");
+    // auto-load first ROM
+    window.onload = () => {
+      startEmulator(currentGame);
+    };
+  </script>
 
-    requestAnimationFrame(frameLoop);
-}
-
-requestAnimationFrame(frameLoop);
-</script>
+  <script src="https://cdn.emulatorjs.org/latest/data/loader.js"></script>
 
 </body>
 </html>
