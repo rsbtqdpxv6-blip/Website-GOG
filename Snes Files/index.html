@@ -1,172 +1,125 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>SNES Emulator (Offline)</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SNES Emulator</title>
 
-  <style>
-    body {
-      margin: 0;
-      background: black;
-      color: white;
-      font-family: sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-    }
+<style>
+body {
+    margin: 0;
+    background: #111;
+    color: white;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
 
-    canvas {
-      width: 512px;
-      height: 448px;
-      image-rendering: pixelated;
-      border: 2px solid white;
-      background: black;
-    }
+/* top bar */
+#ui {
+    padding: 10px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
 
-    #ui {
-      margin-top: 10px;
-    }
-  </style>
+button {
+    padding: 10px 14px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    background: #4f46e5;
+    color: white;
+}
+
+button:hover {
+    background: #4338ca;
+}
+
+/* canvas */
+#screen {
+    width: 768px;
+    height: 672px;
+    image-rendering: pixelated;
+    background: black;
+}
+</style>
 </head>
 
 <body>
 
-  <canvas id="screen" width="256" height="224"></canvas>
+<div id="ui">
+    <input type="file" id="romInput" accept=".sfc,.smc,.zip">
+    <button onclick="toggleFS()">Fullscreen</button>
+</div>
 
-  <div id="ui">
-    <input type="file" id="rom" accept=".sfc,.smc">
-  </div>
+<canvas id="screen" width="256" height="224"></canvas>
 
-  <!-- Your compiled emulator -->
-  <script src="emulator.js"></script>
+<script>
+/*
+IMPORTANT:
+This assumes your SNES WASM build exposes a Module object like:
+- Module._loadRom(...)
+- Module._frame()
+- Module.canvas or Module.setCanvas(...)
+*/
 
-  <script>
-    const canvas = document.getElementById("screen");
+const canvas = document.getElementById("screen");
 
-    let romPtr = 0;
+const Module = {
+    canvas: canvas,
 
-function alloc(size) {
-  if (Module._malloc) return Module._malloc(size);
-  if (Module.malloc) return Module.malloc(size);
+    // IMPORTANT for GitHub Pages WASM loading
+    locateFile(path) {
+        return path;
+    },
 
-  throw new Error("No malloc function found in WASM exports");
-}
+    onRuntimeInitialized() {
+        console.log("SNES core loaded");
+    }
+};
 
-    // =========================
-    // WASM MODULE SETUP
-    // =========================
-    const Module = {
-      canvas: canvas,
+// Attach module globally for your wasm bundle
+window.Module = Module;
 
-      locateFile(path) {
-        return path; // required for file:// usage
-      },
+/* ROM LOADER */
+document.getElementById("romInput").addEventListener("change", async (e) => {
+    const file = e.target.files[0];
+    const data = new Uint8Array(await file.arrayBuffer());
 
-      onRuntimeInitialized() {
-        console.log("✅ WASM initialized");
-
-        // Try common reset calls
-        if (Module._reset) Module._reset();
-        if (Module._init) Module._init();
-
-        startLoop();
-      }
-    };
-
-    // =========================
-    // EMULATION LOOP
-    // =========================
-    function startLoop() {
-      function frame() {
-        if (Module._frame) Module._frame();
-        else if (Module._step) Module._step();
-        else if (Module._runFrame) Module._runFrame();
-
-        requestAnimationFrame(frame);
-      }
-
-      requestAnimationFrame(frame);
+    if (!Module._malloc || !Module._loadRom) {
+        alert("Your WASM build is missing required SNES functions.");
+        return;
     }
 
-    // =========================
-    // ROM LOADER
-    // =========================
-    document.getElementById("rom").addEventListener("change", async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
+    const ptr = Module._malloc(data.length);
+    Module.HEAPU8.set(data, ptr);
 
-  const rom = new Uint8Array(await file.arrayBuffer());
-
-  console.log("ROM loaded:", rom.length);
-
-  // 🔥 TRY COMMON NON-MALLOC APIs
-
-  if (Module.loadRom) {
-    console.log("Using Module.loadRom(Uint8Array)");
-    Module.loadRom(rom);
-  }
-
-  else if (Module.loadROM) {
-    console.log("Using Module.loadROM(Uint8Array)");
-    Module.loadROM(rom);
-  }
-
-  else if (Module.ccall) {
-    console.log("Using ccall(loadRom)");
-    Module.ccall("loadRom", null, ["array"], [rom]);
-  }
-
-  else if (Module.instance?.exports?.loadRom) {
-    console.log("Using instance.exports.loadRom");
-    Module.instance.exports.loadRom(rom);
-  }
-
-  else {
-    console.error("❌ No ROM loading function found in your WASM build");
-  }
-
-  // start emulator if needed
-  if (Module.start) Module.start();
-  if (Module.run) Module.run();
+    Module._loadRom(ptr, data.length);
+    Module._start();
 });
 
-console.log("MODULE KEYS:", Object.keys(Module));
+/* 60 FPS loop */
+function loop() {
+    if (Module._frame) Module._frame();
+    requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
 
-    // =========================
-    // INPUT (basic SNES mapping)
-    // =========================
-    const keyMap = {
-      z: 0,       // A
-      x: 1,       // B
-      a: 2,       // X
-      s: 3,       // Y
-      Enter: 4,   // Start
-      Shift: 5    // Select
-    };
+/* fullscreen */
+function toggleFS() {
+    if (!document.fullscreenElement) {
+        canvas.requestFullscreen();
+    } else {
+        document.exitFullscreen();
+    }
+}
+</script>
 
-    window.addEventListener("keydown", (e) => {
-      const code = keyMap[e.key];
-      if (code !== undefined && Module._keyDown) {
-        Module._keyDown(code);
-      }
-    });
-
-    window.addEventListener("keyup", (e) => {
-      const code = keyMap[e.key];
-      if (code !== undefined && Module._keyUp) {
-        Module._keyUp(code);
-      }
-    });
-
-    // =========================
-    // DEBUG HELPERS
-    // =========================
-    window.Module = Module;
-
-    console.log("🧠 Emulator loader ready");
-  </script>
+<!-- YOUR EMULATOR FILES (IMPORTANT) -->
+<script src="snes.js"></script>
 
 </body>
 </html>
