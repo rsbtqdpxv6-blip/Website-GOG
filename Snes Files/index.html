@@ -8,15 +8,15 @@
 <style>
 body {
     margin: 0;
-    background: black;
+    background: #111;
     color: white;
-    font-family: Arial, sans-serif;
+    font-family: Arial;
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-#ui {
+#top {
     padding: 10px;
 }
 
@@ -31,70 +31,87 @@ canvas {
 
 <body>
 
-<div id="ui">
+<div id="top">
     <input type="file" id="rom">
 </div>
 
 <canvas id="screen" width="256" height="224"></canvas>
 
 <script>
-/*
-IMPORTANT FIX:
-We DO NOT redeclare Module if snes.js already defines it.
-We only safely extend it.
-*/
+/* =========================
+   SAFE EMSCRIPTEN MODULE
+   ========================= */
 
 window.Module = window.Module || {};
 
-// wait for canvas
 Module.canvas = document.getElementById("screen");
 
-// DO NOT override Module completely (THIS FIXES YOUR ERROR)
 Module.locateFile = function(path) {
-    return path;
+    return "./" + path;
 };
 
-// safe hook
 Module.onRuntimeInitialized = function() {
-    console.log("SNES WASM loaded successfully");
+    console.log("SNES WASM loaded");
 
-    if (!Module._frame) {
-        console.warn("Warning: _frame not found in WASM exports");
-    }
+    // debug what we actually got
+    console.log("Module keys:", Object.keys(Module));
 };
-
-// expose back
-window.Module = Module;
 </script>
 
 <script src="snes.js"></script>
 
 <script>
-/* ROM loader */
+let romPtr = null;
+
+/* =========================
+   ROM LOADER
+   ========================= */
 document.getElementById("rom").addEventListener("change", async (e) => {
     const file = e.target.files[0];
-    const data = new Uint8Array(await file.arrayBuffer());
+    const rom = new Uint8Array(await file.arrayBuffer());
 
-    console.log("ROM loaded:", data.length);
+    console.log("ROM size:", rom.length);
 
-    if (!Module._malloc || !Module._loadRom) {
-        alert("WASM exports missing (_malloc or _loadRom not found)");
+    if (!Module._malloc) {
+        alert("WASM not ready or invalid Snes9x build.");
         return;
     }
 
-    const ptr = Module._malloc(data.length);
-    Module.HEAPU8.set(data, ptr);
+    romPtr = Module._malloc(rom.length);
+    Module.HEAPU8.set(rom, romPtr);
 
-    Module._loadRom(ptr, data.length);
-
-    if (Module._start) Module._start();
+    /* Try common Snes9x entry points safely */
+    if (Module.ccall) {
+        try {
+            Module.ccall(
+                "loadROM",
+                null,
+                ["number", "number"],
+                [romPtr, rom.length]
+            );
+        } catch (e) {
+            console.warn("loadROM failed:", e);
+        }
+    } else {
+        alert("This Snes9x build does not use ccall. Wrong WASM build.");
+    }
 });
 
-/* 60 FPS loop */
+/* =========================
+   60 FPS EMULATION LOOP
+   ========================= */
 function loop() {
-    if (Module._frame) Module._frame();
+    try {
+        if (Module.ccall) {
+            Module.ccall("runFrame", null, [], []);
+        }
+    } catch (e) {
+        // ignore frame errors
+    }
+
     requestAnimationFrame(loop);
 }
+
 requestAnimationFrame(loop);
 </script>
 
