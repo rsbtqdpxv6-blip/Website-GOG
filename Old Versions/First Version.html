@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wesley's Proxy and Game links :D</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #577694;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        /* Toggle Button styling */
+        .toggle-btn {
+            background-color: #4f46e5;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+            transition: background 0.2s, transform 0.1s;
+            margin-bottom: 30px;
+        }
+
+        .toggle-btn:hover {
+            background-color: #4338ca;
+        }
+
+        .toggle-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Container for all content - hidden by default */
+        .directory-container {
+            width: 100%;
+            max-width: 500px;
+            display: none; /* Controlled by JavaScript */
+        }
+
+        /* Category block */
+        .category-section {
+            margin-bottom: 25px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        /* Category Titles */
+        .category-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #475569;
+            margin-top: 0;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 8px;
+        }
+
+        /* Link list styling */
+        .link-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .link-item {
+            margin-bottom: 8px;
+        }
+
+        .link-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .link-item a {
+            display: block;
+            color: #1e293b;
+            text-decoration: none;
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 14px;
+            background-color: #f8fafc;
+            border-left: 3px solid #6366f1;
+            transition: transform 0.15s, background-color 0.15s;
+        }
+
+        .link-item a:hover {
+            transform: translateX(4px);
+            background-color: #eef2ff;
+            color: #4f46e5;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Main Toggle Button -->
+    <button class="toggle-btn" id="toggleBtn">Open Proxy Links</button>
+
+    <!-- Content Container -->
+    <div class="directory-container" id="directory"></div>
+
+    <script>
+        // =========================================================
+        // EASILY EDIT YOUR CATEGORIES AND LINKS HERE
+        // You can change names, add blocks, or drop in raw URLs.
+        // =========================================================
+        const myLinkDirectory = {
+            "Development Tools": [
+                "https://github.com",
+                "https://stackoverflow.com",
+                "https://codepen.io"
+            ],
+            "Research & News": [
+                "https://wikipedia.org",
+                "https://ycombinator.com"
+            ],
+            "Social Media": [
+                "https://reddit.com",
+                "https://youtube.com"
+                ],
+            "My Own Website Tutorial for this (Coming Soon)": [
+                "https://COMING.SOON"
+            ]
+        };
+
+        // DOM elements
+        const toggleBtn = document.getElementById('toggleBtn');
+        const directory = document.getElementById('directory');
+
+        // Build the entire structured list automatically on page load
+        function buildDirectory() {
+            // Loop through each category name
+            for (const [categoryName, urls] of Object.entries(myLinkDirectory)) {
+                
+                // Create a container box for the category
+                const section = document.createElement('div');
+                section.className = 'category-section';
+
+                // Create the title element
+                const title = document.createElement('h2');
+                title.className = 'category-title';
+                title.textContent = categoryName;
+                section.appendChild(title);
+
+                // Create the unordered list
+                const ul = document.createElement('ul');
+                ul.className = 'link-list';
+
+                // Loop through urls in this specific category
+                urls.forEach(url => {
+                    const li = document.createElement('li');
+                    li.className = 'link-item';
+
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.target = "_blank"; // Opens in a new tab
+
+                    // Clean raw link text for clean aesthetics
+                    let cleanText = url
+                        .replace(/^https?:\/\//, '')
+                        .replace(/^www\./, '');
+                    
+                    a.textContent = cleanText;
+
+                    li.appendChild(a);
+                    ul.appendChild(li);
+                });
+
+                section.appendChild(ul);
+                directory.appendChild(section);
+            }
+        }
+
+        // Handle open and close button logic
+        toggleBtn.addEventListener('click', () => {
+            if (directory.style.display === 'block') {
+                directory.style.display = 'none';
+                toggleBtn.textContent = 'Open Proxy Links';
+            } else {
+                directory.style.display = 'block';
+                toggleBtn.textContent = 'Close Proxy Links';
+            }
+        });
+
+        // Initialize lists behind the scenes right away
+        buildDirectory();
+    </script>
+
+</body>
+</html>

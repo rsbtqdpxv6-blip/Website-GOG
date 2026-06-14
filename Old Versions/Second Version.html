@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wesley's Proxy and Game links :D</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #577694;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        /* Toggle Button styling */
+        .toggle-btn {
+            background-color: #4f46e5;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+            transition: background 0.2s, transform 0.1s;
+            margin-bottom: 30px;
+        }
+
+        .toggle-btn:hover {
+            background-color: #4338ca;
+        }
+
+        .toggle-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Full-screen overlay setup */
+        .image-viewer-container {
+            display: none; 
+            position: fixed; 
+            z-index: 9999; 
+            left: 0;
+            top: 0;
+            width: 100vw; 
+            height: 100vh; 
+            background-color: rgba(0, 0, 0, 0.95); /* Deep dark background */
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Forces image to expand fully without distorting or clipping */
+        .viewer-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Fills screen cleanly regardless of monitor shape */
+            display: block;
+        }
+
+        /* Fixed inside top-right corner over the picture */
+        .close-img-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            padding: 3px 4px;
+            font-size: 5px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            z-index: 10000; /* Stays above picture layout */
+        }
+
+        .close-img-btn:hover {
+            background-color: rgba(239, 68, 68, 0.9);
+        }
+
+        /* Container for all content - hidden by default */
+        .directory-container {
+            width: 100%;
+            max-width: 500px;
+            display: none;
+        }
+
+        /* Category block */
+        .category-section {
+            margin-bottom: 25px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        /* Category Titles */
+        .category-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #475569;
+            margin-top: 0;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 8px;
+        }
+
+        /* Link list styling */
+        .link-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .link-item {
+            margin-bottom: 8px;
+        }
+
+        .link-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .link-item a {
+            display: block;
+            color: #1e293b;
+            text-decoration: none;
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 14px;
+            background-color: #f8fafc;
+            border-left: 3px solid #6366f1;
+            transition: transform 0.15s, background-color 0.15s;
+        }
+
+        .link-item a:hover {
+            transform: translateX(4px);
+            background-color: #eef2ff;
+            color: #4f46e5;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Main Buttons -->
+    <div style="display: flex; gap: 15px;">
+        <button class="toggle-btn" id="toggleBtn">Open Proxy Links</button>
+        <button class="toggle-btn" id="openImgBtn" style="background-color: #10b981;">View Picture</button>
+    </div>
+
+    <!-- Hidden Picture Container -->
+    <div class="image-viewer-container" id="imageViewer">
+        <img class="viewer-image" src="Screenshot 2026-06-12 2.41.28 PM.png" alt="Fullscreen Content">
+        <button class="close-img-btn" id="closeImgBtn">✕</button>
+    </div>
+
+    <!-- Content Container -->
+    <div class="directory-container" id="directory"></div>
+
+<h1 style="font-family: 'Segoe UI', sans-serif;">Sites And Games, you can add more, just say it on the GITHUB! (games added soon)</h1>
+
+
+    <script>
+        const myLinkDirectory = {
+            "Development Tools and Proxies to find and stuff": [
+                "https://github.com",
+                "https://gitlab.com"
+            ],
+            "WIKIPEDIA IS UNTRUSTED- SCHOOL (who cares?)": [
+                "https://wikipedia.org"
+            ],
+            "Social Media": [
+                "https://reddit.com",
+                "https://youtube.com"
+            ],
+            "The GitHub Link to Update your HTML! (go to tags or releases)": [
+                "https://github.com/rsbtqdpxv6-blip/Html-GOG-Bypass"
+            ]
+        };
+
+        // DOM elements
+        const toggleBtn = document.getElementById('toggleBtn');
+        const directory = document.getElementById('directory');
+        const openImgBtn = document.getElementById('openImgBtn');
+        const closeImgBtn = document.getElementById('closeImgBtn');
+        const imageViewer = document.getElementById('imageViewer');
+
+        // Build the entire structured list automatically on page load
+        function buildDirectory() {
+            for (const [categoryName, urls] of Object.entries(myLinkDirectory)) {
+                const section = document.createElement('div');
+                section.className = 'category-section';
+
+                const title = document.createElement('h2');
+                title.className = 'category-title';
+                title.textContent = categoryName;
+                section.appendChild(title);
+
+                const ul = document.createElement('ul');
+                ul.className = 'link-list';
+
+                urls.forEach(url => {
+                    const li = document.createElement('li');
+                    li.className = 'link-item';
+
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.target = "_blank";
+
+                    let cleanText = url
+                        .replace(/^https?:\/\//, '')
+                        .replace(/^www\./, '');
+                    
+                    a.textContent = cleanText;
+
+                    li.appendChild(a);
+                    ul.appendChild(li);
+                });
+
+                section.appendChild(ul);
+                directory.appendChild(section);
+            }
+        }
+
+        // Handle open and close directory button logic
+        toggleBtn.addEventListener('click', () => {
+            if (directory.style.display === 'block') {
+                directory.style.display = 'none';
+                toggleBtn.textContent = 'Open Proxy Links';
+            } else {
+                directory.style.display = 'block';
+                toggleBtn.textContent = 'Close Proxy Links';
+            }
+        });
+
+        // Displays container with flex layouts to securely center things full-screen
+        openImgBtn.addEventListener('click', () => {
+            imageViewer.style.display = 'flex';
+        });
+
+        closeImgBtn.addEventListener('click', () => {
+            imageViewer.style.display = 'none';
+        });
+
+        // NEW FEATURE: Closes the viewer if the user presses the 'Escape' key
+        window.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                imageViewer.style.display = 'none';
+            }
+        });
+
+        // Initialize lists behind the scenes right away
+        buildDirectory();
+    </script>
+
+</body>
+</html>
