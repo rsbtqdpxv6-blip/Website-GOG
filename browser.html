@@ -3,67 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Independent HTML Web Dashboard</title>
+    <title>Educational Web Hub</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; height: 100vh; display: flex; flex-direction: column; background: #1c1c1e; color: #fff; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; height: 100vh; display: flex; flex-direction: column; background: #202124; color: #fff; }
         
-        /* Minimal Address Bar */
-        .nav-bar { display: flex; padding: 12px; background: #2c2c2e; gap: 10px; align-items: center; border-bottom: 1px solid #3a3a3c; }
-        .address-input { flex-grow: 1; padding: 10px 16px; border: none; border-radius: 20px; font-size: 14px; background: #1c1c1e; color: #fff; }
-        .address-input:focus { outline: 2px solid #0a84ff; }
-        .action-btn { padding: 10px 24px; background: #0a84ff; color: #fff; border: none; border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 14px; transition: background 0.2s; }
-        .action-btn:hover { background: #0070e0; }
+        /* Navigation Controls */
+        .navbar { display: flex; padding: 10px; background: #35363a; gap: 10px; align-items: center; border-bottom: 1px solid #4a4a4a; }
+        .address-bar { flex-grow: 1; padding: 10px 16px; border: none; border-radius: 24px; font-size: 14px; background: #202124; color: white; }
+        .address-bar:focus { outline: 2px solid #8ab4f8; }
+        .btn { padding: 10px 20px; background: #1a73e8; color: white; border: none; border-radius: 24px; cursor: pointer; font-weight: 500; font-size: 14px; transition: background 0.2s; }
+        .btn:hover { background: #1557b0; }
         
-        /* Sandbox Viewport */
-        .frame-canvas { flex-grow: 1; border: none; background: #ffffff; }
+        /* Viewport Canvas */
+        .browser-viewport { flex-grow: 1; border: none; background: white; }
     </style>
 </head>
 <body>
 
-    <div class="nav-bar">
-        <input type="text" id="targetUrl" class="address-input" value="https://example.com" placeholder="Type a website URL and press Enter..." onkeydown="if(event.key === 'Enter') requestPage()">
-        <button class="action-btn" onclick="requestPage()">Launch</button>
+    <div class="navbar">
+        <input type="text" id="urlInput" class="address-bar" value="https://example.com" placeholder="Enter site layout URL (e.g., wikipedia.org)..." onkeydown="if(event.key === 'Enter') launchSite()">
+        <button class="btn" onclick="launchSite()">Go</button>
     </div>
 
-    <!-- Isolated Sandbox Window -->
-    <iframe id="viewCanvas" class="frame-canvas" sandbox="allow-scripts allow-forms allow-same-origin"></iframe>
+    <!-- The actual webpage will display here -->
+    <iframe id="viewport" class="browser-viewport"></iframe>
 
     <script>
-        async function requestPage() {
-            let url = document.getElementById('targetUrl').value.trim();
-            const canvas = document.getElementById('viewCanvas');
+        // Dynamically finds your specific GitHub repository folder path
+        const scopePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
 
-            if (!url) return;
-            if (!/^https?:\/\//i.test(url)) { url = 'https://' + url; }
-            document.getElementById('targetUrl').value = url;
-
-            try {
-                // Uses an open text-stream protocol to pull raw website code straight into your local browser storage
-                const targetResponse = await fetch(`https://allorigins.win{encodeURIComponent(url)}`);
-                let htmlContent = await targetResponse.text();
-
-                // Inject a base target tag so images/stylesheets load correctly from the original host
-                const baseTag = `<base href="${url}/" target="_self">`;
-                htmlContent = htmlContent.replace('<head>', `<head>${baseTag}`);
-
-                // Strip standard header payload elements locally out of the text string
-                const sanitizedBlob = new Blob([htmlContent], { type: 'text/html' });
-                canvas.src = URL.createObjectURL(sanitizedBlob);
-
-            } catch (err) {
-                // Fallback layout if the site has strict network security protections
-                canvas.srcdoc = `
-                    <div style="font-family:sans-serif; padding:40px; color:#333; text-align:center;">
-                        <h2>Loading Frame Security Restrictions</h2>
-                        <p>This site blocks direct embedding. Try testing with simpler text sites (e.g., <b>wikipedia.org</b> or <b>example.com</b>).</p>
-                        <small style="color:#999;">Error Details: ${err.message}</small>
-                    </div>`;
-            }
+        // Register the background Service Worker script under the correct folder scope
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js', { scope: scopePath })
+            .then(() => console.log("Gateway Engine Online."))
+            .catch(err => console.error("Worker Registration Failed:", err));
         }
 
-        // Auto-load home screen
-        window.onload = requestPage;
+        function launchSite() {
+            let targetUrl = document.getElementById('urlInput').value.trim();
+
+            if (!targetUrl) return;
+
+            // Automatically format links that don't have http:// or https://
+            if (!/^https?:\/\//i.test(targetUrl)) {
+                targetUrl = 'https://' + targetUrl;
+            }
+            document.getElementById('urlInput').value = targetUrl;
+
+            // Securely routes the iframe path into our background worker engine loop
+            document.getElementById('viewport').src = window.location.origin + scopePath + 'proxy-gateway/' + encodeURIComponent(targetUrl);
+        }
+
+        // Auto-run standard home layout configuration upon launching
+        window.onload = () => { setTimeout(launchSite, 500); };
     </script>
 
 </body>
