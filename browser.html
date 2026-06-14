@@ -3,60 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Educational Web Hub</title>
+    <title>Standalone HTML Engine</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; height: 100vh; display: flex; flex-direction: column; background: #202124; color: #fff; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; height: 100vh; display: flex; flex-direction: column; background: #1c1c1e; color: #fff; }
         
-        /* Navigation Controls */
-        .navbar { display: flex; padding: 10px; background: #35363a; gap: 10px; align-items: center; border-bottom: 1px solid #4a4a4a; }
-        .address-bar { flex-grow: 1; padding: 10px 16px; border: none; border-radius: 24px; font-size: 14px; background: #202124; color: white; }
-        .address-bar:focus { outline: 2px solid #8ab4f8; }
-        .btn { padding: 10px 20px; background: #1a73e8; color: white; border: none; border-radius: 24px; cursor: pointer; font-weight: 500; font-size: 14px; transition: background 0.2s; }
-        .btn:hover { background: #1557b0; }
+        /* Navigation Controls Bar */
+        .controls { display: flex; padding: 12px; background: #2c2c2e; gap: 10px; align-items: center; border-bottom: 1px solid #3a3a3c; }
+        .address-field { flex-grow: 1; padding: 10px 16px; border: none; border-radius: 20px; font-size: 14px; background: #1c1c1e; color: #fff; }
+        .address-field:focus { outline: 2px solid #0a84ff; }
+        .nav-btn { padding: 10px 24px; background: #0a84ff; color: #fff; border: none; border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 14px; }
+        .nav-btn:hover { background: #0070e0; }
         
-        /* Viewport Canvas */
-        .browser-viewport { flex-grow: 1; border: none; background: white; }
+        /* Viewport Frame Canvas */
+        .view-frame { flex-grow: 1; border: none; background: #ffffff; }
     </style>
 </head>
 <body>
 
-    <div class="navbar">
-        <input type="text" id="urlInput" class="address-bar" value="https://example.com" placeholder="Enter site layout URL (e.g., wikipedia.org)..." onkeydown="if(event.key === 'Enter') launchSite()">
-        <button class="btn" onclick="launchSite()">Go</button>
+    <div class="controls">
+        <input type="text" id="destinationUrl" class="address-field" value="https://example.com" placeholder="Type a domain name and press Enter...">
+        <button class="nav-btn" onclick="executeNavigation()">Launch</button>
     </div>
 
-    <!-- The actual webpage will display here -->
-    <iframe id="viewport" class="browser-viewport"></iframe>
+    <!-- The actual website canvas container -->
+    <iframe id="displayCanvas" class="view-frame" sandbox="allow-scripts allow-forms allow-same-origin"></iframe>
 
     <script>
-        // Dynamically finds your specific GitHub repository folder path
-        const scopePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
-
-        // Register the background Service Worker script under the correct folder scope
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js', { scope: scopePath })
-            .then(() => console.log("Gateway Engine Online."))
-            .catch(err => console.error("Worker Registration Failed:", err));
-        }
-
-        function launchSite() {
-            let targetUrl = document.getElementById('urlInput').value.trim();
-
-            if (!targetUrl) return;
-
-            // Automatically format links that don't have http:// or https://
-            if (!/^https?:\/\//i.test(targetUrl)) {
-                targetUrl = 'https://' + targetUrl;
+        // Set up the event listener for the Enter key immediately
+        document.getElementById('destinationUrl').addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                executeNavigation();
             }
-            document.getElementById('urlInput').value = targetUrl;
+        });
 
-            // Securely routes the iframe path into our background worker engine loop
-            document.getElementById('viewport').src = window.location.origin + scopePath + 'proxy-gateway/' + encodeURIComponent(targetUrl);
+        async function executeNavigation() {
+            let url = document.getElementById('destinationUrl').value.trim();
+            const canvas = document.getElementById('displayCanvas');
+
+            if (!url) return;
+            
+            // Format links that do not have the http protocol prefix
+            if (!/^https?:\/\//i.test(url)) { 
+                url = 'https://' + url; 
+            }
+            document.getElementById('destinationUrl').value = url;
+
+            try {
+                // Fetch the webpage code text using an open mirror gateway
+                const feedResponse = await fetch(`https://allorigins.win{encodeURIComponent(url)}`);
+                if (!feedResponse.ok) throw new Error('Network bridge failed');
+                
+                let textBody = await feedResponse.text();
+
+                // Inject a base tag into the head so external links, pictures, and styles match the original domain
+                const assetBaseTag = `<base href="${url}/" target="_self">`;
+                
+                if (textBody.includes('<head>')) {
+                    textBody = textBody.replace('<head>', `<head>${assetBaseTag}`);
+                } else if (textBody.includes('<html>')) {
+                    textBody = textBody.replace('<html>', `<html><head>${assetBaseTag}</head>`);
+                } else {
+                    textBody = assetBaseTag + textBody;
+                }
+
+                // Convert the completely cleaned text string into a browser-readable blob payload
+                const resourceBlob = new Blob([textBody], { type: 'text/html' });
+                canvas.src = URL.createObjectURL(resourceBlob);
+
+            } catch (networkError) {
+                // Fallback template design if a site has intense firewalls 
+                canvas.srcdoc = `
+                    <div style="font-family: system-ui, sans-serif; padding: 50px; text-align: center; color: #333;">
+                        <h2 style="color: #ff3b30;">Frame Integration Restricted</h2>
+                        <p style="margin-top: 10px;">This domain utilizes heavy security headers that block client-side reading.</p>
+                        <p style="color: #666; font-size: 13px; margin-top: 5px;">Error: ${networkError.message}</p>
+                        <hr style="margin: 20px auto; width: 50%; border: 0; border-top: 1px solid #eee;">
+                        <p>Try testing with simpler database sites like <b>wikipedia.org</b> or <b>example.com</b>.</p>
+                    </div>`;
+            }
         }
 
-        // Auto-run standard home layout configuration upon launching
-        window.onload = () => { setTimeout(launchSite, 500); };
+        // Run navigation when the dashboard launches
+        window.onload = executeNavigation;
     </script>
 
 </body>
