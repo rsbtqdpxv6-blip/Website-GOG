@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>SNES EmulatorJS + Persistent Saves</title>
 
-  <link rel="stylesheet" href="Website-GOG/snes-files/emulatorjs/data/emulator.css">
+  <link rel="stylesheet" href="emulatorjs/data/emulator.css">
 
   <style>
     body {
@@ -66,7 +66,7 @@
       EJS_player = "#game";
       EJS_core = "snes";
       EJS_gameUrl = "roms/" + rom + ".sfc";
-      EJS_pathtodata = "Website-GOG/snes-files/emulatorjs/data/";
+      EJS_pathtodata = "emulatorjs/data/";
       EJS_startOnLoaded = true;
 
       EJS_onLoad = function() {
@@ -87,7 +87,7 @@
 
       if (!emulatorScriptLoaded) {
          const script = document.createElement("script");
-         script.src = "Website-GOG/snes-files/emulatorjs/data/loader.js";
+         script.src = "emulatorjs/data/loader.js";
          document.body.appendChild(script);
          emulatorScriptLoaded = true;
 }
