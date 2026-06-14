@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>SNES EmulatorJS + Save States</title>
+  <title>SNES EmulatorJS + Persistent Saves</title>
 
   <link rel="stylesheet" href="emulatorjs/data/emulator.css">
 
@@ -23,7 +23,6 @@
     select, button {
       padding: 8px;
       margin: 5px;
-      font-size: 14px;
     }
 
     #game {
@@ -37,8 +36,8 @@
 
   <div id="topbar">
     <select id="romSelect">
-      <option value="roms/super-mario-world.sfc">Super Mario World</option>
-      <option value="roms/zelda.sfc">Zelda: A Link to the Past</option>
+      <option value="super-mario-world">Super Mario World</option>
+      <option value="zelda">Zelda: A Link to the Past</option>
     </select>
 
     <button onclick="loadROM()">Load</button>
@@ -53,6 +52,10 @@
     let currentRom = "";
     let emulatorReady = false;
 
+    function storageKey() {
+      return "snes_save_" + currentRom;
+    }
+
     function startEmu(rom) {
       currentRom = rom;
       emulatorReady = false;
@@ -61,13 +64,24 @@
 
       EJS_player = "#game";
       EJS_core = "snes";
-      EJS_gameUrl = rom;
+      EJS_gameUrl = "roms/" + rom + ".sfc";
       EJS_pathtodata = "emulatorjs/data/";
       EJS_startOnLoaded = true;
 
-      // Hook into EmulatorJS lifecycle
       EJS_onLoad = function() {
         emulatorReady = true;
+
+        // 🔥 AUTO-RESTORE SAVE ON LOAD
+        const saved = localStorage.getItem(storageKey());
+        if (saved && window.EJS_emulator) {
+          try {
+            const binary = Uint8Array.from(atob(saved), c => c.charCodeAt(0));
+            EJS_emulator.loadState(binary);
+            console.log("Save state restored");
+          } catch (e) {
+            console.log("No valid save to restore");
+          }
+        }
       };
 
       const script = document.createElement("script");
@@ -83,32 +97,51 @@
       document.getElementById("game").requestFullscreen();
     }
 
-    // ===== SAVE / LOAD STATES =====
-
+    // =========================
+    // 💾 SAVE STATE (LOCALSTORAGE)
+    // =========================
     function saveState() {
       if (!emulatorReady || !window.EJS_emulator) {
-        alert("Emulator not ready yet!");
+        alert("Emulator not ready!");
         return;
       }
 
       try {
-        EJS_emulator.saveState();
-        alert("State saved!");
+        const state = EJS_emulator.saveState();
+
+        // Convert to Base64
+        const binary = new Uint8Array(state);
+        const base64 = btoa(String.fromCharCode(...binary));
+
+        localStorage.setItem(storageKey(), base64);
+
+        alert("Saved to browser storage!");
       } catch (e) {
         console.log(e);
         alert("Save failed");
       }
     }
 
+    // =========================
+    // save state mechanism localstorage
+    // =========================
     function loadState() {
       if (!emulatorReady || !window.EJS_emulator) {
-        alert("Emulator not ready yet!");
+        alert("Emulator not ready!");
         return;
       }
 
       try {
-        EJS_emulator.loadState();
-        alert("State loaded!");
+        const saved = localStorage.getItem(storageKey());
+        if (!saved) {
+          alert("No save found!");
+          return;
+        }
+
+        const binary = Uint8Array.from(atob(saved), c => c.charCodeAt(0));
+        EJS_emulator.loadState(binary);
+
+        alert("Loaded from storage!");
       } catch (e) {
         console.log(e);
         alert("Load failed");
