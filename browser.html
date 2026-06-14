@@ -3,64 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HTML Web Browser</title>
+    <title>GitHub Hosted HTML Browser</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: Arial, sans-serif; height: 100vh; display: flex; flex-direction: column; background: #202124; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; height: 100vh; display: flex; flex-direction: column; background: #202124; color: white; }
         
-        /* Browser Address Bar UI */
-        .navbar { display: flex; align-items: center; padding: 8px; background: #35363a; gap: 8px; }
-        .btn { background: #5f6368; border: none; color: white; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        .btn:hover { background: #70757a; }
-        .address-bar { flex-grow: 1; padding: 8px; border-radius: 20px; border: none; background: #202124; color: white; padding-left: 15px; font-size: 14px; }
+        /* Navigation UI */
+        .navbar { display: flex; padding: 10px; background: #35363a; gap: 10px; align-items: center; }
+        .address-bar { flex-grow: 1; padding: 10px 16px; border: none; border-radius: 24px; font-size: 14px; background: #202124; color: white; }
         .address-bar:focus { outline: 2px solid #8ab4f8; }
+        .btn { padding: 10px 20px; background: #1a73e8; color: white; border: none; border-radius: 24px; cursor: pointer; font-weight: 500; }
+        .btn:hover { background: #1557b0; }
         
-        /* Viewport Frame */
-        .browser-viewport { flex-grow: 1; border: none; background: white; }
+        /* Web Viewport */
+        .viewport-frame { flex-grow: 1; border: none; background: white; }
     </style>
 </head>
 <body>
 
-    <!-- Browser Controls -->
     <div class="navbar">
-        <button class="btn" onclick="goBack()">◀</button>
-        <button class="btn" onclick="goForward()">▶</button>
-        <button class="btn" onclick="refreshPage()">↻</button>
-        <input type="text" id="urlInput" class="address-bar" value="https://example.com" onkeydown="if(event.key === 'Enter') loadURL()">
-        <button class="btn" onclick="loadURL()">Go</button>
+        <input type="text" id="urlBar" class="address-bar" value="https://example.com" onkeydown="if(event.key === 'Enter') browseToSite()">
+        <button class="btn" onclick="browseToSite()">Go</button>
     </div>
 
-    <!-- Embedded Browser Window -->
-    <iframe id="viewport" class="browser-viewport" src="https://example.com"></iframe>
+    <!-- The actual webpage displays inside this canvas -->
+    <iframe id="browserWindow" class="viewport-frame"></iframe>
 
     <script>
-        const viewport = document.getElementById('viewport');
-        const urlInput = document.getElementById('urlInput');
+        // Setup internal environment pathing safely on GitHub Pages
+        const scopePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
 
-        // Uses a public reverse proxy to bypass CORS restrictions
-        const proxyUrl = "https://corsproxy.io?";
+        // Register the background gateway engine
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js', { scope: scopePath })
+            .then(() => console.log("Engine Active."))
+            .catch(err => console.error("Activation Failed:", err));
+        }
 
-        function loadURL() {
-            let targetUrl = urlInput.value.trim();
-
-            // Automatically add https:// if missing
+        function browseToSite() {
+            let targetUrl = document.getElementById('urlBar').value.trim();
+            
+            // Automatically patch links missing standard protocol prefixes
             if (!/^https?:\/\//i.test(targetUrl)) {
                 targetUrl = 'https://' + targetUrl;
             }
-
-            urlInput.value = targetUrl;
-
-            // Route through the proxy to prevent frame-blocking headers
-            viewport.src = proxyUrl + encodeURIComponent(targetUrl);
+            document.getElementById('urlBar').value = targetUrl;
+            
+            // Pass the target directly through the secure service worker layout path
+            document.getElementById('browserWindow').src = window.location.origin + scopePath + 'proxy-gateway/' + encodeURIComponent(targetUrl);
         }
 
-        function refreshPage() {
-            viewport.src = viewport.src;
-        }
-
-        // Note: History navigation is limited by iframe security policies
-        function goBack() { window.history.back(); }
-        function goForward() { window.history.forward(); }
+        // Run default site configuration upon launching layout
+        window.onload = () => { setTimeout(browseToSite, 500); };
     </script>
 
 </body>
