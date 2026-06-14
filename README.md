@@ -1,2 +1,1 @@
-# Website-GOG
-a website for b_,y_,p_,a_,s_,s GOGaurd
+Honestly i am just adding Roms to this site, no p./r./o./x./y/.s yet. Planning on adding Sega Genesis.
