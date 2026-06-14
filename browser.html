@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Web Browser</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; height: 100vh; display: flex; flex-direction: column; background: #202124; }
+        
+        /* Browser Address Bar UI */
+        .navbar { display: flex; align-items: center; padding: 8px; background: #35363a; gap: 8px; }
+        .btn { background: #5f6368; border: none; color: white; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .btn:hover { background: #70757a; }
+        .address-bar { flex-grow: 1; padding: 8px; border-radius: 20px; border: none; background: #202124; color: white; padding-left: 15px; font-size: 14px; }
+        .address-bar:focus { outline: 2px solid #8ab4f8; }
+        
+        /* Viewport Frame */
+        .browser-viewport { flex-grow: 1; border: none; background: white; }
+    </style>
+</head>
+<body>
+
+    <!-- Browser Controls -->
+    <div class="navbar">
+        <button class="btn" onclick="goBack()">◀</button>
+        <button class="btn" onclick="goForward()">▶</button>
+        <button class="btn" onclick="refreshPage()">↻</button>
+        <input type="text" id="urlInput" class="address-bar" value="https://example.com" onkeydown="if(event.key === 'Enter') loadURL()">
+        <button class="btn" onclick="loadURL()">Go</button>
+    </div>
+
+    <!-- Embedded Browser Window -->
+    <iframe id="viewport" class="browser-viewport" src="https://example.com"></iframe>
+
+    <script>
+        const viewport = document.getElementById('viewport');
+        const urlInput = document.getElementById('urlInput');
+
+        // Uses a public reverse proxy to bypass CORS restrictions
+        const proxyUrl = "https://corsproxy.io?";
+
+        function loadURL() {
+            let targetUrl = urlInput.value.trim();
+
+            // Automatically add https:// if missing
+            if (!/^https?:\/\//i.test(targetUrl)) {
+                targetUrl = 'https://' + targetUrl;
+            }
+
+            urlInput.value = targetUrl;
+
+            // Route through the proxy to prevent frame-blocking headers
+            viewport.src = proxyUrl + encodeURIComponent(targetUrl);
+        }
+
+        function refreshPage() {
+            viewport.src = viewport.src;
+        }
+
+        // Note: History navigation is limited by iframe security policies
+        function goBack() { window.history.back(); }
+        function goForward() { window.history.forward(); }
+    </script>
+
+</body>
+</html>
