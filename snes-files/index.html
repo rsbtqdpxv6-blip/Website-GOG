@@ -5,9 +5,6 @@
   <title>SNES Emulator (EmulatorJS)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-  <!-- EmulatorJS loader -->
-  <script src="https://cdn.emulatorjs.org/latest/data/loader.js"></script>
-
   <style>
     body {
       margin: 0;
@@ -54,7 +51,7 @@ let EJS_player = "#game";
 let EJS_core = "snes";
 
 let EJS_gameUrl = "";
-let EJS_pathtodata = "https://cdn.emulatorjs.org/latest/data/";
+let EJS_pathtodata = "snes-files/emulatorjs/data/";
 
 // Enable advanced features
 let EJS_DEBUG = false;
@@ -78,7 +75,7 @@ let EJS_shader = 0;
 
 // Initialize EmulatorJS
 const script = document.createElement("script");
-script.src = "https://cdn.emulatorjs.org/latest/data/loader.js";
+script.src = "snes-files/emulatorjs/data/loader.js";
 document.body.appendChild(script);
 
 // ROM file loader
