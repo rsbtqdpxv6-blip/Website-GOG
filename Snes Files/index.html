@@ -2,13 +2,16 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>SNES EmulatorJS - ROM Selector</title>
+  <title>SNES EmulatorJS + Save States</title>
+
+  <link rel="stylesheet" href="emulatorjs/data/emulator.css">
+
   <style>
     body {
       margin: 0;
       background: #111;
       color: white;
-      font-family: Arial, sans-serif;
+      font-family: Arial;
       text-align: center;
     }
 
@@ -35,58 +38,87 @@
   <div id="topbar">
     <select id="romSelect">
       <option value="roms/super-mario-world.sfc">Super Mario World</option>
-      <option value="roms/donkey-kong-country.sfc">Donkey Kong Country</option>
-      <option value="roms/zelda-alttp.sfc">Zelda: A Link to the Past</option>
+      <option value="roms/zelda.sfc">Zelda: A Link to the Past</option>
     </select>
 
-    <button onclick="loadROM()">Load Game</button>
-    <button onclick="goFullscreen()">Fullscreen</button>
+    <button onclick="loadROM()">Load</button>
+    <button onclick="saveState()">Save</button>
+    <button onclick="loadState()">Load</button>
+    <button onclick="fullscreen()">Fullscreen</button>
   </div>
 
   <div id="game"></div>
 
   <script>
-    let currentGame = "roms/super-mario-world.sfc";
+    let currentRom = "";
+    let emulatorReady = false;
 
-    function startEmulator(rom) {
+    function startEmu(rom) {
+      currentRom = rom;
+      emulatorReady = false;
+
       document.getElementById("game").innerHTML = "";
 
       EJS_player = "#game";
       EJS_core = "snes";
       EJS_gameUrl = rom;
-      EJS_pathtodata = "https://cdn.emulatorjs.org/latest/data/";
+      EJS_pathtodata = "emulatorjs/data/";
       EJS_startOnLoaded = true;
-      EJS_fullscreenOnLoaded = false;
+
+      // Hook into EmulatorJS lifecycle
+      EJS_onLoad = function() {
+        emulatorReady = true;
+      };
 
       const script = document.createElement("script");
-      script.src = "https://cdn.emulatorjs.org/latest/data/loader.js";
+      script.src = "emulatorjs/data/loader.js";
       document.body.appendChild(script);
     }
 
     function loadROM() {
-      currentGame = document.getElementById("romSelect").value;
-      startEmulator(currentGame);
+      startEmu(document.getElementById("romSelect").value);
     }
 
-    function goFullscreen() {
-      const elem = document.getElementById("game");
+    function fullscreen() {
+      document.getElementById("game").requestFullscreen();
+    }
 
-      if (elem.requestFullscreen) {
-        elem.requestFullscreen();
-      } else if (elem.webkitRequestFullscreen) {
-        elem.webkitRequestFullscreen();
-      } else if (elem.msRequestFullscreen) {
-        elem.msRequestFullscreen();
+    // ===== SAVE / LOAD STATES =====
+
+    function saveState() {
+      if (!emulatorReady || !window.EJS_emulator) {
+        alert("Emulator not ready yet!");
+        return;
+      }
+
+      try {
+        EJS_emulator.saveState();
+        alert("State saved!");
+      } catch (e) {
+        console.log(e);
+        alert("Save failed");
       }
     }
 
-    // auto-load first ROM
+    function loadState() {
+      if (!emulatorReady || !window.EJS_emulator) {
+        alert("Emulator not ready yet!");
+        return;
+      }
+
+      try {
+        EJS_emulator.loadState();
+        alert("State loaded!");
+      } catch (e) {
+        console.log(e);
+        alert("Load failed");
+      }
+    }
+
     window.onload = () => {
-      startEmulator(currentGame);
+      loadROM();
     };
   </script>
-
-  <script src="https://cdn.emulatorjs.org/latest/data/loader.js"></script>
 
 </body>
 </html>
