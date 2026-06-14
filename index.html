@@ -117,50 +117,6 @@ button {
     cursor: pointer;
 }
 
-/* ===== NES ===== */
-#nesOverlay {
-    display: none;
-    position: fixed;
-    z-index: 99999;
-    left: 0;
-    top: 0;
-    width: 100vw;
-    height: 100vh;
-    background: black;
-}
-
-#nesCanvas {
-    width: 100vw;
-    height: 100vh;
-    image-rendering: pixelated;
-}
-
-#nesMenu {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    background: white;
-    padding: 15px;
-    border-radius: 12px;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
-    font-family: inherit;
-}
-
-/* NES buttons */
-#nesMenu button {
-    margin-top: 6px;
-    padding: 8px 10px;
-    border-radius: 6px;
-    border: none;
-    background: #4f46e5;
-    color: white;
-    cursor: pointer;
-}
-
-#nesMenu button:hover {
-    background: #4338ca;
-}
-
 /* ===== MODAL ===== */
 .modal {
     display: none;
@@ -251,26 +207,6 @@ button {
 
 <h1>Sites And Games</h1>
 
-<button class="toggle-btn" id="openNESBtn" style="background:#f59e0b;">
-    Play NES Games
-</button>
-
-<!-- NES OVERLAY -->
-<div id="nesOverlay">
-    <button class="close-img-btn" id="closeNESBtn">✕</button>
-
-    <canvas id="nesCanvas" width="256" height="240"></canvas>
-
-    <div id="nesMenu">
-        <h3>NES Games</h3>
-        <div id="romList"></div>
-        <hr>
-        <input type="file" id="romPicker" accept=".nes">
-    </div>
-</div>
-
-<script src="https://unpkg.com/jsnes/dist/jsnes.min.js"></script>
-
 <script>
 const myLinkDirectory = {
     "Development Tools and Proxies to find and stuff": [
@@ -331,111 +267,6 @@ window.addEventListener('keydown', e => {
     if (e.key === 'Escape') imageViewer.style.display = 'none';
 });
 
-/* ================= NES ================= */
-
-const openNESBtn = document.getElementById("openNESBtn");
-const nesOverlay = document.getElementById("nesOverlay");
-const closeNESBtn = document.getElementById("closeNESBtn");
-const romList = document.getElementById("romList");
-const romPicker = document.getElementById("romPicker");
-const canvas = document.getElementById("nesCanvas");
-const ctx = canvas.getContext("2d");
-
-const roms = [
-    { name: "Super Mario Bros", file: "mario.nes" }
-];
-const keys = {
-    ArrowUp: jsnes.Controller.BUTTON_UP,
-    ArrowDown: jsnes.Controller.BUTTON_DOWN,
-    ArrowLeft: jsnes.Controller.BUTTON_LEFT,
-    ArrowRight: jsnes.Controller.BUTTON_RIGHT,
-    KeyZ: jsnes.Controller.BUTTON_A,
-    KeyX: jsnes.Controller.BUTTON_B,
-    Enter: jsnes.Controller.BUTTON_START,
-    ShiftRight: jsnes.Controller.BUTTON_SELECT
-};
-
-window.addEventListener("keydown", e => {
-    if (keys[e.code] !== undefined) {
-        nes.buttonDown(1, keys[e.code]);
-    }
-});
-
-window.addEventListener("keyup", e => {
-    if (keys[e.code] !== undefined) {
-        nes.buttonUp(1, keys[e.code]);
-    }
-});
-
-let nes = new jsnes.NES({
-    onFrame: function(frameBuffer) {
-        const imageData = ctx.createImageData(256, 240);
-        const data = imageData.data;
-
-        for (let i = 0; i < frameBuffer.length; i++) {
-            const pixel = frameBuffer[i];
-            imageData.data[i * 4]     = pixel & 0xFF;        // R
-            imageData.data[i * 4 + 1] = (pixel >> 8) & 0xFF; // G
-            imageData.data[i * 4 + 2] = (pixel >> 16) & 0xFF;// B
-            imageData.data[i * 4 + 3] = 255;        }
-
-        ctx.putImageData(imageData, 0, 0);
-    }
-});
-
-let running = false;
-
-function runNES() {
-    if (!running) return;
-
-    nes.frame();
-    setTimeout(runNES, 1000 / 60);
-}
-
-function loadROM(data) {
-    nes.loadROM(data);
-
-    document.getElementById("nesMenu").style.display = "none";
-
-    running = true;
-    runNES();
-}
-
-function buildRomList() {
-    romList.innerHTML = "";
-    roms.forEach(r => {
-        const btn = document.createElement("button");
-        btn.textContent = r.name;
-        btn.onclick = () => {
-            fetch(r.file)
-                .then(res => res.arrayBuffer())
-                .then(data => loadROM(new Uint8Array(data)));
-        };
-        romList.appendChild(btn);
-    });
-}
-
-romPicker.addEventListener("change", e => {
-    const file = e.target.files[0];
-    const reader = new FileReader();
-    reader.onload = () => loadROM(new Uint8Array(reader.result));
-    reader.readAsArrayBuffer(file);
-});
-
-openNESBtn.onclick = () => {
-    nesOverlay.style.display = "block";
-    buildRomList();
-};
-
-closeNESBtn.onclick = () => {
-    nesOverlay.style.display = "none";
-    document.getElementById("nesMenu").style.display = "block";
-    running = false;
-};
-
-buildRomList();
-buildDirectory();
-</script>
 <!-- The Trigger Button -->
 <button onclick="openModal()">Play SNES Games</button>
 
