@@ -10,7 +10,7 @@ self.addEventListener('fetch', event => {
 
         event.respondWith(
             // Fetches data transparently using your exact active cloud domain layout
-            fetch('https://github.dev' + targetUrlStr)
+            fetch('https://improved-disco-7vj44qjv4777hx7w5-8080.app.github.dev/' + targetUrlStr)
             .then(response => {
                 const customHeaders = new Headers(response.headers);
                 
