@@ -20,7 +20,7 @@ self.addEventListener('fetch', event => {
 
         event.respondWith(
             // Forces all queries cleanly through your unblocked improved-disco server tunnel
-            fetch('https://improved-disco-7vj44qjv4777hx7w5-8080.app.github.dev/' + targetUrlStr, fetchOptions)
+            fetch('http://improved-disco-7vj44qjv4777hx7w5-8080.githubpreview.dev/' + targetUrlStr, fetchOptions)
             .then(async response => {
                 const contentType = response.headers.get('content-type') || '';
                 const customHeaders = new Headers(response.headers);
