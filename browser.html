@@ -22,18 +22,17 @@
 <body>
 
     <div class="navbar">
-        <input type="text" id="urlInput" class="address-bar" value="https://example.com" placeholder="Enter website URL (e.g., wikipedia.org)..." onkeydown="if(event.key === 'Enter') launchSite()">
+        <input type="text" id="urlInput" class="address-bar" value="https://reddit.com" placeholder="Enter website URL (e.g., old.reddit.com)..." onkeydown="if(event.key === 'Enter') launchSite()">
         <button class="btn" onclick="launchSite()">Go</button>
     </div>
 
-    <!-- The actual webpage will display here -->
+    <!-- The actual webpage displays inside this container -->
     <iframe id="viewport" class="browser-viewport"></iframe>
 
     <script>
-        // Dynamically finds your specific GitHub repository folder path scope
         const scopePath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+        const iframe = document.getElementById('viewport');
 
-        // Register the background Service Worker script under the correct folder scope
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js', { scope: scopePath })
             .then(() => console.log("Gateway Engine Online."))
@@ -42,20 +41,43 @@
 
         function launchSite() {
             let targetUrl = document.getElementById('urlInput').value.trim();
-
             if (!targetUrl) return;
 
-            // Automatically format links that don't have http:// or https://
             if (!/^https?:\/\//i.test(targetUrl)) {
                 targetUrl = 'https://' + targetUrl;
             }
             document.getElementById('urlInput').value = targetUrl;
-
-            // Securely routes the iframe path into our background worker engine loop
-            document.getElementById('viewport').src = window.location.origin + scopePath + 'proxy-gateway/' + encodeURIComponent(targetUrl);
+            
+            // Route initial launch through the scope loop
+            iframe.src = window.location.origin + scopePath + 'proxy-gateway/' + encodeURIComponent(targetUrl);
         }
 
-        // Auto-run standard home layout configuration upon launching
+        // INTERCEPT INTERNAL LINKS: Forces links clicked inside the iframe to stay in the proxy
+        iframe.addEventListener('load', function() {
+            try {
+                // Read the active page content inside the frame
+                const frameWindow = iframe.contentWindow || iframe.contentDocument.defaultView;
+                
+                // Watch every click event inside the embedded site
+                frameWindow.document.addEventListener('click', function(e) {
+                    const closestLink = e.target.closest('a');
+                    
+                    if (closestLink && closestLink.href) {
+                        e.preventDefault(); // Stop Firefox from loading the raw link directly
+                        
+                        let clickedUrl = closestLink.href;
+                        document.getElementById('urlInput').value = clickedUrl;
+                        
+                        // Force rewrite the link and push it back through your gateway tunnel
+                        iframe.src = window.location.origin + scopePath + 'proxy-gateway/' + encodeURIComponent(clickedUrl);
+                    }
+                }, true);
+            } catch (err) {
+                // If a site features deep security, fallback silently to avoid breaking the window layout
+                console.log("Cross-origin frame click capture limited: ", err.message);
+            }
+        });
+
         window.onload = () => { setTimeout(launchSite, 500); };
     </script>
 
