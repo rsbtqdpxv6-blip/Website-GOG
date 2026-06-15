@@ -4,37 +4,36 @@ self.addEventListener('activate', e => e.waitUntil(clients.claim()));
 self.addEventListener('fetch', event => {
     const requestUrl = event.request.url;
 
-    // Catch every request, search query, or form submission routed through the gateway hook
     if (requestUrl.includes('/proxy-gateway/')) {
         const marker = '/proxy-gateway/';
         const markerIndex = requestUrl.indexOf(marker);
         const targetUrlStr = decodeURIComponent(requestUrl.substring(markerIndex + marker.length));
 
-        // Clones the incoming request data so search parameters are preserved
-        const requestClone = event.request.clone();
+        // Create a basic GET request to handle search queries safely
+        const fetchOptions = {
+            method: 'GET',
+            headers: {
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+            }
+        };
 
         event.respondWith(
-            // Forwards everything (including search queries) safely to your active Codespace port
-            fetch('https://improved-disco-7vj44qjv4777hx7w5-8080.app.github.dev/' + targetUrlStr, {
-                method: requestClone.method,
-                headers: requestClone.headers,
-                // Keeps body details intact if you are executing a search form submission
-                body: requestClone.method !== 'GET' && requestClone.method !== 'HEAD' ? requestClone.body : null
-            })
+            // Forces all queries cleanly through your unblocked improved-disco server tunnel
+            fetch('https://improved-disco-7vj44qjv4777hx7w5-8080.app.github.dev/' + targetUrlStr, fetchOptions)
             .then(async response => {
                 const contentType = response.headers.get('content-type') || '';
                 const customHeaders = new Headers(response.headers);
                 
-                // Clear the framing security blocks
+                // Clear the framing security blockades instantly
                 customHeaders.delete('X-Frame-Options');
                 customHeaders.delete('Content-Security-Policy');
                 customHeaders.delete('content-security-policy');
 
-                // If the response is HTML code, rewrite search paths dynamically
                 if (contentType.includes('text/html')) {
                     let htmlContent = await response.text();
                     
-                    // Forces all form actions and asset layouts to pull cleanly from the correct location
+                    // Forces sub-elements and search inputs to track natively within the proxy window
                     const assetBaseTag = `<base href="${targetUrlStr}" target="_self">`;
                     htmlContent = htmlContent.replace('<head>', `<head>${assetBaseTag}`);
                     
@@ -52,7 +51,7 @@ self.addEventListener('fetch', event => {
                 });
             })
             .catch(err => {
-                return new Response(`<h3>Search Execution Error</h3><p>${err.message}</p>`, {
+                return new Response(`<h3>Proxy Gateway Exception</h3><p>${err.message}</p><p>Ensure your Codespace is active and Port 8080 is Public.</p>`, {
                     headers: { 'Content-Type': 'text/html' }
                 });
             })
