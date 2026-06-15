@@ -8,10 +8,12 @@ self.addEventListener('fetch', event => {
         const targetUrlStr = decodeURIComponent(event.request.url.substring(markerIndex + marker.length));
 
         event.respondWith(
-            // WE WILL PASTE YOUR UNBLOCKED CODESPACE URL HERE IN THE NEXT STEP
+            // 🚀 YOUR LIVE LINK PINNED DIRECTLY BELOW (Ensure the trailing slash remains intact)
             fetch(`https://github.dev{targetUrlStr}`)
             .then(response => {
                 const customHeaders = new Headers(response.headers);
+                
+                // Keeps unblocking rules active to drop iframe security walls
                 customHeaders.delete('X-Frame-Options');
                 customHeaders.delete('Content-Security-Policy');
                 customHeaders.delete('content-security-policy');
@@ -23,7 +25,7 @@ self.addEventListener('fetch', event => {
                 });
             })
             .catch(err => {
-                return new Response(`<h3>Proxy Connection Failed</h3><p>${err.message}</p>`, {
+                return new Response(`<h3>Proxy Gateway Connection Error</h3><p>${err.message}</p>`, {
                     headers: { 'Content-Type': 'text/html' }
                 });
             })
