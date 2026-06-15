@@ -2,18 +2,19 @@ self.addEventListener('install', e => self.skipWaiting());
 self.addEventListener('activate', e => e.waitUntil(clients.claim()));
 
 self.addEventListener('fetch', event => {
+    // Catch every frame network request routed through the proxy-gateway path
     if (event.request.url.includes('/proxy-gateway/')) {
         const marker = '/proxy-gateway/';
         const markerIndex = event.request.url.indexOf(marker);
         const targetUrlStr = decodeURIComponent(event.request.url.substring(markerIndex + marker.length));
 
         event.respondWith(
-            // 🚀 YOUR LIVE LINK PINNED DIRECTLY BELOW (Ensure the trailing slash remains intact)
-            fetch(`https://github.dev{targetUrlStr}`)
+            // Fetches data transparently using your exact active cloud domain layout
+            fetch('https://github.dev' + targetUrlStr)
             .then(response => {
                 const customHeaders = new Headers(response.headers);
                 
-                // Keeps unblocking rules active to drop iframe security walls
+                // CRITICAL STEP: Erase the headers that trigger the "Refused to connect" blocks
                 customHeaders.delete('X-Frame-Options');
                 customHeaders.delete('Content-Security-Policy');
                 customHeaders.delete('content-security-policy');
@@ -25,7 +26,7 @@ self.addEventListener('fetch', event => {
                 });
             })
             .catch(err => {
-                return new Response(`<h3>Proxy Gateway Connection Error</h3><p>${err.message}</p>`, {
+                return new Response(`<h3>Connection Failed</h3><p>${err.message}</p><p>Ensure your Codespace is running and port 8080 is Public.</p>`, {
                     headers: { 'Content-Type': 'text/html' }
                 });
             })
