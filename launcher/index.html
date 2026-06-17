@@ -143,11 +143,13 @@
         <div class="modal-content">
             <div class="modal-header">
     <h3 id="modalTitle" style="margin:0;">Game Title</h3>
-    <div style="display: flex; align-items: center; gap: 20px;">
-        <button onclick="toggleFullscreen()" style="background: none; border: none; color: #a1a1aa; font-size: 20px; cursor: pointer;">⛶</button>
-        <button class="close-btn" onclick="closeGame()">&times;</button>
+    <div class="modal-controls" style="display: flex; align-items: center; gap: 20px;">
+        <!-- THIS IS THE FULLSCREEN BUTTON -->
+        <button class="control-btn" title="Toggle Fullscreen" onclick="toggleFullscreen()" style="background: none; border: none; color: #a1a1aa; font-size: 20px; cursor: pointer;">⛶</button>
+        <button class="control-btn close-btn" title="Close Game" onclick="closeGame()" style="background: none; border: none; color: #a1a1aa; font-size: 26px; cursor: pointer;">&times;</button>
     </div>
 </div>
+
 
     <script>
         // CONFIGURATION: Add your local game folders and files here!
