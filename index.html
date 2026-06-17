@@ -422,14 +422,6 @@ buildDirectory();
 <!-- The Trigger Button -->
 <button onclick="openModal()">Play SNES Games</button>
 
-<!-- The Popup Container (Hidden by default) -->
-<div id="myModal" class="modal">
-<div class="modal-content">
-<!-- The X Close Button -->
-<span class="close-btn" onclick="closeModal()">&times;</span>
-
-<!-- The Embedded HTML File -->
-<iframe src="snes-files/index.html" class="modal-iframe"></iframe>
 <style>
 .custom-button {
 display: inline-block;
@@ -445,6 +437,15 @@ cursor: pointer;
 background-color: #0056b3;
 }
 </style>
+
+<!-- The Popup Container (Hidden by default) -->
+<div id="myModal" class="modal">
+<div class="modal-content">
+<!-- The X Close Button -->
+<span class="close-btn" onclick="closeModal()">&times;</span>
+
+<!-- The Embedded HTML File -->
+<iframe src="snes-files/index.html" class="modal-iframe"></iframe>
 </div>
 </div>
 
@@ -515,7 +516,7 @@ document.getElementById("myModal").style.display = "none";
 .custom-button {
 display: inline-block;
 padding: 10px 20px;
-background-color: #fdba28;
+background-color: #2896fd65;
 color: white;
 text-decoration: none;
 border-radius: 5px;
@@ -523,7 +524,7 @@ border: none;
 cursor: pointer;
 }
 .custom-button:hover {
-background-color: #fdba28;
+background-color: #5a23f0;
 }
 </style>
 
