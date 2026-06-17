@@ -1,241 +1,231 @@
- <!DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My HTML Games Launcher</title>
+    <style>
+        :root {
+            --bg-color: #121214;
+            --card-bg: #1e1e24;
+            --text-color: #ffffff;
+            --accent-color: #6366f1;
+            --accent-hover: #4f46e5;
+        }
 
-<title>Game Launcher</title>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
 
-<style>
-:root{
-    --bg:#0f172a;
-    --card:#1e293b;
-    --hover:#334155;
-    --accent:#3b82f6;
-    --text:#f8fafc;
-    --muted:#94a3b8;
-}
+        header {
+            max-width: 1200px;
+            margin: 0 auto 30px auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
 
-body{
-    font-family:system-ui,sans-serif;
-    background:var(--bg);
-    color:var(--text);
-    margin:0;
-    padding:30px;
-}
+        h1 { margin: 0; font-size: 24px; }
 
-h1{
-    margin-bottom:20px;
-}
+        .search-bar {
+            background: var(--card-bg);
+            border: 1px solid #3f3f46;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 300px;
+            outline: none;
+        }
 
-#search{
-    width:100%;
-    padding:12px;
-    border:none;
-    border-radius:10px;
-    background:var(--card);
-    color:white;
-    margin-bottom:20px;
-}
+        .games-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+        }
 
-#categories{
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-    margin-bottom:20px;
-}
+        .game-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            border: 1px solid #27272a;
+        }
 
-.cat{
-    border:none;
-    padding:8px 14px;
-    border-radius:999px;
-    cursor:pointer;
-    background:var(--card);
-    color:white;
-}
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0,0,0,0.5);
+        }
 
-.cat.active{
-    background:var(--accent);
-}
+        .game-thumb {
+            width: 100%;
+            height: 140px;
+            background: #2d2d34;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            object-fit: cover;
+        }
 
-#games{
-    display:grid;
-    gap:12px;
-}
+        .game-info { padding: 15px; }
+        .game-title { margin: 0 0 5px 0; font-size: 18px; }
+        .game-genre { color: #a1a1aa; font-size: 12px; text-transform: uppercase; }
 
-.game{
-    background:var(--card);
-    padding:16px;
-    border-radius:12px;
+        /* Modal Overlay */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
 
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-}
+        .modal-content {
+            width: 90%;
+            max-width: 960px;
+            height: 80vh;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
 
-.game:hover{
-    background:var(--hover);
-}
+        .modal-header {
+            background: var(--card-bg);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-.desc{
-    color:var(--muted);
-    font-size:14px;
-}
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
 
-.play{
-    background:var(--accent);
-    color:white;
-    text-decoration:none;
-    padding:10px 18px;
-    border-radius:8px;
-}
-</style>
+        iframe {
+            width: 100%;
+            flex-grow: 1;
+            border: none;
+            background: #000;
+        }
+    </style>
 </head>
 <body>
 
-<h1 id="title">Loading...</h1>
+    <header>
+        <h1>🎮 My Games Library</h1>
+        <input type="text" id="search" class="search-bar" placeholder="Search games..." oninput="filterGames()">
+    </header>
 
-<input
-    id="search"
-    placeholder="Search games..."
->
+    <main class="games-grid" id="gamesGrid"></main>
 
-<div id="categories"></div>
-<div id="games"></div>
-
-<script>
-let allGames = [];
-let activeCategory = "All";
-
-const titleEl = document.getElementById("title");
-const gamesEl = document.getElementById("games");
-const categoriesEl = document.getElementById("categories");
-const searchEl = document.getElementById("search");
-
-async function loadGames() {
-
-    const response =
-        await fetch("games.json");
-
-    const data =
-        await response.json();
-
-    titleEl.textContent =
-        data.title || "Games";
-
-    allGames = data.games;
-
-    buildCategories();
-    renderGames();
-}
-
-function buildCategories() {
-
-    categoriesEl.innerHTML = "";
-
-    const categories = [
-        "All",
-        ...new Set(
-            allGames.map(
-                game => game.category
-            )
-        )
-    ];
-
-    categories.forEach(category => {
-
-        const button =
-            document.createElement("button");
-
-        button.className =
-            "cat" +
-            (category === "All"
-                ? " active"
-                : "");
-
-        button.textContent =
-            category;
-
-        button.onclick = () => {
-
-            activeCategory =
-                category;
-
-            document
-                .querySelectorAll(".cat")
-                .forEach(btn =>
-                    btn.classList.remove("active")
-                );
-
-            button.classList.add("active");
-
-            renderGames();
-        };
-
-        categoriesEl.appendChild(button);
-    });
-}
-
-function renderGames() {
-
-    const search =
-        searchEl.value.toLowerCase();
-
-    gamesEl.innerHTML = "";
-
-    const filtered =
-        allGames.filter(game => {
-
-            const matchesSearch =
-                game.name
-                    .toLowerCase()
-                    .includes(search) ||
-
-                game.description
-                    .toLowerCase()
-                    .includes(search);
-
-            const matchesCategory =
-                activeCategory === "All" ||
-                game.category === activeCategory;
-
-            return matchesSearch &&
-                   matchesCategory;
-        });
-
-    filtered.forEach(game => {
-
-        const div =
-            document.createElement("div");
-
-        div.className = "game";
-
-        div.innerHTML = `
-            <div>
-                <h3>${game.name}</h3>
-                <div class="desc">
-                    ${game.description}
-                </div>
+    <!-- Game Player Modal -->
+    <div id="gameModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle" style="margin:0;">Game Title</h3>
+                <button class="close-btn" onclick="closeGame()">&times;</button>
             </div>
+            <iframe id="gameFrame" src=""></iframe>
+        </div>
+    </div>
 
-            <a
-                class="play"
-                href="${game.file}">
-                Play
-            </a>
-        `;
+    <script>
+        // CONFIGURATION: Add your local game folders and files here!
+        const games = [
+            {
+                title: "Super Mario Replica",
+                path: "games/mario/index.html", // Relative path to your game entry file
+                thumb: "🍄",                   // Emoji or image URL path
+                genre: "Platformer"
+            },
+            {
+                title: "Retro Tetris",
+                path: "games/tetris/index.html",
+                thumb: "🧱",
+                genre: "Puzzle"
+            },
+            {
+                title: "Space Invaders",
+                path: "games/space/index.html",
+                thumb: "🚀",
+                genre: "Arcade"
+            }
+        ];
 
-        gamesEl.appendChild(div);
-    });
-}
+        const grid = document.getElementById('gamesGrid');
+        const modal = document.getElementById('gameModal');
+        const frame = document.getElementById('gameFrame');
+        const modalTitle = document.getElementById('modalTitle');
 
-searchEl.addEventListener(
-    "input",
-    renderGames
-);
+        // Render library cards
+        function displayGames(gamesList) {
+            grid.innerHTML = "";
+            gamesList.forEach(game => {
+                const card = document.createElement('div');
+                card.className = 'game-card';
+                card.onclick = () => launchGame(game.title, game.path);
 
-loadGames();
-</script>
+                // Check if thumb is image URL or emoji string
+                const isImg = game.thumb.includes('.') || game.thumb.startsWith('http');
+                const visual = isImg ? `<img src="${game.thumb}" class="game-thumb" alt="${game.title}">` : `<div class="game-thumb">${game.thumb}</div>`;
 
+                card.innerHTML = `
+                    ${visual}
+                    <div class="game-info">
+                        <h3 class="game-title">${game.title}</h3>
+                        <span class="game-genre">${game.genre}</span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Action commands
+        function launchGame(title, path) {
+            modalTitle.innerText = title;
+            frame.src = path;
+            modal.style.display = 'flex';
+            frame.focus();
+        }
+
+        function closeGame() {
+            modal.style.display = 'none';
+            frame.src = ''; // Unloads the game to stop background audio
+        }
+
+        function filterGames() {
+            const query = document.getElementById('search').value.toLowerCase();
+            const filtered = games.filter(g => g.title.toLowerCase().includes(query) || g.genre.toLowerCase().includes(query));
+            displayGames(filtered);
+        }
+
+        // Close modal if user clicks background overlay
+        window.onclick = function(event) {
+            if (event.target == modal) { closeGame(); }
+        }
+
+        // Initialize display
+        displayGames(games);
+    </script>
 </body>
 </html>
