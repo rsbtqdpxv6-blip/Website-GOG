@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>ndsEJS</title>
+
+  <link rel="stylesheet" href="emulatorjs/data/emulator.css">
+
+  <style>
+    body {
+      margin: 0;
+      background: #111;
+      color: white;
+      font-family: Arial;
+      text-align: center;
+    }
+
+    #topbar {
+      padding: 10px;
+      background: #222;
+    }
+
+    select, button {
+      padding: 10px;
+      margin: 5px;
+    }
+
+    #game {
+      width: 100vw;
+      height: calc(100vh - 60px);
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="topbar">
+  <select id="romSelect">
+    <option value="./roms/mario.nds">mario test</option>
+  </select>
+
+  <button onclick="changeROM()">Load</button>
+  <button onclick="fullscreen()">Fullscreen</button>
+</div>
+
+<div id="game"></div>
+
+<script>
+let currentRom = localStorage.getItem("nds_rom") || "./roms/nds/game.nds"; "./roms/nds/game.dsi";
+let emulatorReady = false;
+
+document.getElementById("romSelect").value = currentRom;
+
+// EmulatorJS config
+EJS_player = "#game";
+EJS_core = "nds";
+EJS_gameUrl = currentRom;
+EJS_pathtodata = "emulatorjs/data/";
+EJS_language = "en-US";
+EJS_startOnLoaded = true;
+
+EJS_onLoad = function () {
+  emulatorReady = true;
+};
+
+function changeROM() {
+  const selected = document.getElementById("romSelect").value;
+  localStorage.setItem("nds_rom", selected);
+  location.reload();
+}
+
+function fullscreen() {
+  document.getElementById("game").requestFullscreen();
+}
+</script>
+
+<script src="emulatorjs/data/loader.js"></script>
+
+</body>
+</html>
