@@ -351,21 +351,24 @@ window.addEventListener("keyup", e => {
     }
 });
 
+const audio = new NESAudio(new (window.AudioContext || window.webkitAudioContext)());
+
 let nes = new jsnes.NES({
     onFrame: function(frameBuffer) {
         const imageData = ctx.createImageData(256, 240);
-        const data = imageData.data;
-
         for (let i = 0; i < frameBuffer.length; i++) {
             const pixel = frameBuffer[i];
-            imageData.data[i * 4]     = pixel & 0xFF;        // R
-            imageData.data[i * 4 + 1] = (pixel >> 8) & 0xFF; // G
-            imageData.data[i * 4 + 2] = (pixel >> 16) & 0xFF;// B
-            imageData.data[i * 4 + 3] = 255;        }
-
+            imageData.data[i * 4]     = pixel & 0xFF;        
+            imageData.data[i * 4 + 1] = (pixel >> 8) & 0xFF; 
+            imageData.data[i * 4 + 2] = (pixel >> 16) & 0xFF;
+            imageData.data[i * 4 + 3] = 255;        
+        }
         ctx.putImageData(imageData, 0, 0);
-    }
+    },
+    // Just add this single line:
+    onAudioSample: audio.onAudioSample 
 });
+
 
 let running = false;
 
