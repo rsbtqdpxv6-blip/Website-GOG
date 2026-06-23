@@ -1,1 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wesley's P\r\o\x\y and Game links :D</title>
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<style>
+body {
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+background-color: #577694;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: flex-start;
+min-height: 100vh;
+margin: 0;
+padding: 40px 20px;
+}
 
+/* ===== BUTTONS ===== */
+.toggle-btn {
+background-color: #4f46e5;
+color: white;
+border: none;
+padding: 14px 28px;
+font-size: 16px;
+font-weight: 600;
+border-radius: 10px;
+cursor: pointer;
+box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+transition: 0.2s ease;
+margin: 6px;
+}
+
+.toggle-btn:hover {
+background-color: #4f464f;
+transform: translateY(-1px);
+}
+
+.toggle-btn:active {
+transform: scale(0.98);
+}
+
+button {
+font-family: inherit;
+}
+
+.directory-container {
+width: 100%;
+max-width: 520px;
+display: none;
+}
+
+.category-section {
+margin-bottom: 18px;
+background: white;
+padding: 16px;
+border-radius: 12px;
+box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+.category-section h2 {
+font-size: 15px;
+margin-bottom: 10px;
+}
+
+/* links */
+.link-list { list-style: none; padding: 0; margin: 0; }
+
+.link-item { margin-bottom: 8px; }
+
+.link-item a {
+display: block;
+color: #1e293b;
+text-decoration: none;
+padding: 10px 12px;
+border-radius: 8px;
+background-color: #f8fafc;
+transition: 0.2s;
+}
+
+.link-item a:hover {
+background-color: #e2e8f0;
+}
+
+/* ===== IMAGE VIEWER ===== */
+.image-viewer-container {
+display: none;
+position: fixed;
+z-index: 9999;
+left: 0;
+top: 0;
+width: 100vw;
+height: 100vh;
+background-color: rgba(0,0,0,0.95);
+justify-content: center;
+align-items: center;
+}
+
+.viewer-image {
+width: 100%;
+height: 100%;
+object-fit: contain;
+}
+
+.close-img-btn {
+position: absolute;
+top: 12px;
+right: 12px;
+background: rgba(0,0,0,0.6);
+color: white;
+border: none;
+padding: 8px 10px;
+font-size: 14px;
+font-weight: bold;
+border-radius: 8px;
+cursor: pointer;
+}
+
+/* ===== NES ===== */
+#nesOverlay {
+    display: none;
+    position: fixed;
+    z-index: 99999;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background: black;
+}
+
+#nesCanvas {
+    width: 100vw;
+    height: 100vh;
+    image-rendering: pixelated;
+}
+
+#nesMenu {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: white;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+    font-family: inherit;
+}
+
+/* NES buttons */
+#nesMenu button {
+    margin-top: 6px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: none;
+    background: #4f46e5;
+    color: white;
+    cursor: pointer;
+}
+
+#nesMenu button:hover {
+    background: #4338ca;
+}
+
+/* ===== MODAL ===== */
+.modal {
+display: none;
+position: fixed;
+z-index: 1000;
+left: 0;
+top: 0;
+width: 100%;
+height: 100%;
+background: rgba(0,0,255,0.3);
+}
+
+.modal-content {
+position: relative;
+background: white;
+margin: 5% auto;
+padding: 25px;
+width: 80%;
+height: 80%;
+border-radius: 12px;
+box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.modal-iframe {
+width: 100%;
+height: 95%;
+border: none;
+}
+
+/* close button */
+.close-btn {
+position: absolute;
+right: 12px;
+top: 10px;
+font-size: 26px;
+cursor: pointer;
+color: #666;
+}
+
+.close-btn:hover {
+color: #000;
+}
+</style>
+
+</head>
+
+
+<body onkeyup="if(event.key.toLowerCase()==='g') { var i=document.getElementById('pic'); i.style.display=i.style.display==='none'?'block':'none'; }">
+
+<!-- Fullscreen Hidden Image -->
+<img id="pic" src="Screenshot 2026-06-12 2.41.28 PM.png" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; object-fit:cover; z-index:9999;">
+
+</body>
+
+<body>
+
+<div style="display:flex; gap:15px;">
+<button class="toggle-btn" id="toggleBtn">Open Proxy Links</button>
+<button class="toggle-btn" id="openImgBtn" style="background:#10b981;">View Picture</button>
+</div>
+
+<div class="image-viewer-container" id="imageViewer">
+<img class="viewer-image" src="Screenshot 2026-06-12 2.41.28 PM.png">
+<button class="close-img-btn" id="closeImgBtn">✕</button>
+</div>
+
+<div class="directory-container" id="directory"></div>
+
+<h1>Sites And Games</h1>
+
+<button class="toggle-btn" id="openNESBtn" style="background:#f59e0b;">
+    Play NES Games
+</button>
+
+<!-- NES OVERLAY -->
+<div id="nesOverlay">
+    <button class="close-img-btn" id="closeNESBtn">✕</button>
+
+    <canvas id="nesCanvas" width="256" height="240"></canvas>
+
+    <div id="nesMenu">
+        <h3>NES Games</h3>
+        <div id="romList"></div>
+        <hr>
+        <input type="file" id="romPicker" accept=".nes">
+    </div>
+</div>
+
+<script src="https://unpkg.com/jsnes/dist/jsnes.min.js"></script>
+
+<script>
+const myLinkDirectory = {
+"Development Tools and Proxies to find and stuff": [
+"https://github.com",
+"https://gitlab.com"
+],
+"WIKIPEDIA IS UNTRUSTED- SCHOOL (who cares?)": [
+"https://wikipedia.org"
+],
+"Social Media": [
+"https://reddit.com",
+"https://youtube.com"
+],
+"Link to the browser P-_R-_O-_X-_Y": [
+"idk"
+],
+"The GitHub Link for the Older releases.": [
+"https://github.com/rsbtqdpxv6-blip/Html-GOG-Bypass"
+]
+};
+
+const toggleBtn = document.getElementById('toggleBtn');
+const directory = document.getElementById('directory');
+const openImgBtn = document.getElementById('openImgBtn');
+const imageViewer = document.getElementById('imageViewer');
+
+function buildDirectory() {
+for (const [categoryName, urls] of Object.entries(myLinkDirectory)) {
+const section = document.createElement('div');
+section.className = 'category-section';
+
+const title = document.createElement('h2');
+title.textContent = categoryName;
+section.appendChild(title);
+
+const ul = document.createElement('ul');
+urls.forEach(url => {
+const li = document.createElement('li');
+const a = document.createElement('a');
+a.href = url;
+a.target = "_blank";
+a.textContent = url;
+li.appendChild(a);
+ul.appendChild(li);
+});
+
+section.appendChild(ul);
+directory.appendChild(section);
+}
+}
+
+toggleBtn.onclick = () => {
+directory.style.display =
+directory.style.display === 'block' ? 'none' : 'block';
+};
+
+openImgBtn.onclick = () => imageViewer.style.display = 'flex';
+document.getElementById('closeImgBtn').onclick = () => imageViewer.style.display = 'none';
+
+window.addEventListener('keydown', e => {
+if (e.key === 'Escape') imageViewer.style.display = 'none';
+});
+
+/* ================= NES ================= */
+
+const openNESBtn = document.getElementById("openNESBtn");
+const nesOverlay = document.getElementById("nesOverlay");
+const closeNESBtn = document.getElementById("closeNESBtn");
+const romList = document.getElementById("romList");
+const romPicker = document.getElementById("romPicker");
+const canvas = document.getElementById("nesCanvas");
+const ctx = canvas.getContext("2d");
+
+const roms = [
+    { name: "Super Mario Bros", file: "nes-files/mario.nes" }
+];
+const keys = {
+    ArrowUp: jsnes.Controller.BUTTON_UP,
+    ArrowDown: jsnes.Controller.BUTTON_DOWN,
+    ArrowLeft: jsnes.Controller.BUTTON_LEFT,
+    ArrowRight: jsnes.Controller.BUTTON_RIGHT,
+    KeyZ: jsnes.Controller.BUTTON_A,
+    KeyX: jsnes.Controller.BUTTON_B,
+    Enter: jsnes.Controller.BUTTON_START,
+    ShiftRight: jsnes.Controller.BUTTON_SELECT
+};
+
+window.addEventListener("keydown", e => {
+    if (keys[e.code] !== undefined) {
+        nes.buttonDown(1, keys[e.code]);
+    }
+});
+
+window.addEventListener("keyup", e => {
+    if (keys[e.code] !== undefined) {
+        nes.buttonUp(1, keys[e.code]);
+    }
+});
+
+let nes = new jsnes.NES({
+    onFrame: function(frameBuffer) {
+        const imageData = ctx.createImageData(256, 240);
+        const data = imageData.data;
+
+        for (let i = 0; i < frameBuffer.length; i++) {
+            const pixel = frameBuffer[i];
+            imageData.data[i * 4]     = pixel & 0xFF;        // R
+            imageData.data[i * 4 + 1] = (pixel >> 8) & 0xFF; // G
+            imageData.data[i * 4 + 2] = (pixel >> 16) & 0xFF;// B
+            imageData.data[i * 4 + 3] = 255;        }
+
+        ctx.putImageData(imageData, 0, 0);
+    }
+});
+
+let running = false;
+
+function runNES() {
+    if (!running) return;
+
+    nes.frame();
+    setTimeout(runNES, 1000 / 60);
+}
+
+function loadROM(data) {
+    nes.loadROM(data);
+
+    document.getElementById("nesMenu").style.display = "none";
+
+    running = true;
+    runNES();
+}
+
+function buildRomList() {
+    romList.innerHTML = "";
+    roms.forEach(r => {
+        const btn = document.createElement("button");
+        btn.textContent = r.name;
+        btn.onclick = () => {
+            fetch(r.file)
+                .then(res => res.arrayBuffer())
+                .then(data => loadROM(new Uint8Array(data)));
+        };
+        romList.appendChild(btn);
+    });
+}
+
+romPicker.addEventListener("change", e => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.onload = () => loadROM(new Uint8Array(reader.result));
+    reader.readAsArrayBuffer(file);
+});
+
+openNESBtn.onclick = () => {
+    nesOverlay.style.display = "block";
+    buildRomList();
+};
+
+closeNESBtn.onclick = () => {
+    nesOverlay.style.display = "none";
+    document.getElementById("nesMenu").style.display = "block";
+    running = false;
+};
+
+buildRomList();
+buildDirectory();
+</script>
+<!-- The Trigger Button -->
+<button onclick="openModal()" style="display: block; margin-bottom: 6px; background-color: #00ffc8; color: white; padding: 10px 20px; font-size: 16px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer;">Play SNES Games</button>
+
+<style>
+.custom-button {
+display: inline-block;
+padding: 10px 20px;
+background-color: #007BFF;
+color: white;
+text-decoration: none;
+border-radius: 5px;
+border: none;
+cursor: pointer;
+}
+.custom-button:hover {
+background-color: #0056b3;
+}
+</style>
+
+<!-- The Popup Container (Hidden by default) -->
+<div id="myModal" class="modal">
+<div class="modal-content">
+<!-- The X Close Button -->
+<span class="close-btn" onclick="closeModal()">&times;</span>
+
+<!-- The Embedded HTML File -->
+<iframe src="snes-files/index.html" class="modal-iframe"></iframe>
+</div>
+</div>
+
+<style>
+/* Background overlay */
+.modal {
+display: none; 
+position: fixed;
+z-index: 1000;
+left: 0;
+top: 0;
+width: 100%;
+height: 100%;
+background-color: rgba(0, 0, 255, 0.3); /* Dimmed background */
+}
+
+/* Modal box wrapper */
+.modal-content {
+position: relative;
+background-color: #fff;
+margin: 5% auto;
+padding: 50px 30px;
+width: 80%;
+height: 80%;
+border-radius: 8px;
+}
+
+/* The X Button style */
+.close-btn {
+position: absolute;
+right: 15px;
+top: 10px;
+font-size: 28px;
+font-weight: bold;
+cursor: pointer;
+color: #aaa;
+}
+
+.close-btn:hover {
+color: #000;
+}
+
+/* The frame containing your folder file */
+.modal-iframe {
+width: 100%;
+height: 95%;
+border: none;
+}
+</style>
+
+<script>
+// JavaScript to open and close the popup window
+function openModal() {
+document.getElementById("myModal").style.display = "block";
+}
+
+function closeModal() {
+document.getElementById("myModal").style.display = "none";
+}
+</script>
+
+</style>
+<!-- HTML -->
+<a href="genesis-files/index.html" class="custom-button">Sega Genesis Games</a>
+
+<!-- Optional CSS to make it look like a real button -->
+<style>
+.custom-button {
+display: inline-block;
+padding: 10px 20px;
+background-color: #FFA500 !important;
+color: white;
+text-decoration: none;
+border-radius: 5px;
+border: none;
+cursor: pointer;
+}
+.custom-button:hover {
+background-color: #5a23f0 !important;
+}
+</style>
+
+<!-- HTML -->
+<a href="ruffle-files/index.html" class="custom-button">Flash Games</a>
+
+<!-- Optional CSS to make it look like a real button -->
+<style>
+.custom-button {
+display: inline-block;
+padding: 10px 20px;
+background-color: #007BFF !important;
+color: white;
+text-decoration: none;
+border-radius: 5px;
+border: none;
+cursor: pointer;
+}
+.custom-button:hover {
+background-color: #0056b3 !important;
+}
+</style>
+
+</style>
+<!-- HTML -->
+<a href="gbc-files/index.html" class="custom-button">Game Boy and Game Boy Colour Games</a>
+
+<!-- Optional CSS to make it look like a real button -->
+<style>
+.custom-button {
+display: inline-block;
+padding: 10px 20px;
+background-color: #00ffc8 !important;
+color: white;
+text-decoration: none;
+border-radius: 5px;
+border: none;
+cursor: pointer;
+}
+.custom-button:hover {
+background-color: #00ffc8 !important;
+}
+</style>
+
+</style>
+<!-- HTML -->
+<a href="n64-files/index.html" class="custom-button">Nintendo 64 Games</a>
+
+<!-- Optional CSS to make it look like a real button -->
+<style>
+.custom-button {
+display: inline-block;
+padding: 10px 20px;
+background-color: #00ffc8 !important;
+color: white;
+text-decoration: none;
+border-radius: 5px;
+border: none;
+cursor: pointer;
+}
+.custom-button:hover {
+background-color: #00ffc8 !important;
+}
+</style>
+
+</style>
+<!-- HTML -->
+<a href="ds-files/index.html" class="custom-button">Nintendo DS Games</a>
+
+<!-- Optional CSS to make it look like a real button -->
+<style>
+.custom-button {
+display: inline-block;
+padding: 10px 20px;
+background-color: #00ffc8 !important;
+color: white;
+text-decoration: none;
+border-radius: 5px;
+border: none;
+cursor: pointer;
+}
+.custom-button:hover {
+background-color: #00ffc8 !important;
+}
+</style>
+
+</style>
+<!-- HTML -->
+<a href="launcher/index.html" class="custom-button">Regular Games</a>
+
+<!-- Optional CSS to make it look like a real button -->
+<style>
+.custom-button {
+display: block;
+margin-bottom: 6px;
+padding: 10px 20px;
+background-color: #00ffc8 !important;
+color: white;
+text-decoration: none;
+border-radius: 5px;
+border: none;
+cursor: pointer;
+}
+.custom-button:hover {
+background-color: #00ffc8 !important;
+}
+</style>
+
+</body>
+</html>
