@@ -421,7 +421,7 @@ buildRomList();
 buildDirectory();
 </script>
 <!-- The Trigger Button -->
-<button onclick="openModal()" style="display: block; margin-bottom: 6px; background-color: #cbd1cc; color: white; padding: 10px 20px; font-size: 16px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer;">Play SNES Games</button>
+<button id="snes-play-btn" onclick="openModal()" style="display: block; margin-bottom: 6px; background-color: #cbd1cc; color: white; padding: 10px 20px; font-size: 16px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer;">Play SNES Games</button>
 
 <style>
 .custom-button {
@@ -515,7 +515,8 @@ document.getElementById("myModal").style.display = "none";
 <!-- Optional CSS to make it look like a real button -->
 <style>
 .custom-button#segagenesis-btn {
-display: inline-block;
+display: block;
+margin-bottom: 6px;
 padding: 10px 20px;
 background-color: #00FFFF;
 color: white;
@@ -535,7 +536,8 @@ background-color: #818580;
 <!-- Optional CSS to make it look like a real button -->
 <style>
 .custom-button#ruffle-btn {
-display: inline-block;
+display: block;
+margin-bottom: 6px;
 padding: 10px 20px;
 background-color: #cbd1cc;
 color: white;
@@ -556,7 +558,8 @@ background-color: #818581;
 <!-- Optional CSS to make it look like a real button -->
 <style>
 .custom-button#gb-btn {
-display: inline-block;
+display: block;
+margin-bottom: 6px;
 padding: 10px 20px;
 background-color: #dae0dc;
 color: white;
@@ -577,7 +580,8 @@ background-color: #818582;
 <!-- Optional CSS to make it look like a real button -->
 <style>
 .custom-button#n64-btn {
-display: inline-block;
+display: block;
+margin-bottom: 6px;
 padding: 10px 20px;
 background-color: #dae1dc;
 color: white;
@@ -598,7 +602,8 @@ background-color: #818583;
 <!-- Optional CSS to make it look like a real button -->
 <style>
 .custom-button#nds-btn {
-display: inline-block;
+display: block;
+margin-bottom: 6px;
 padding: 10px 20px;
 background-color: #dae2dc ;
 color: white;
