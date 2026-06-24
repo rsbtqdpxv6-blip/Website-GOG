@@ -511,7 +511,7 @@ document.getElementById("myModal").style.display = "none";
 </style>
 <!-- HTML -->
 <a href="genesis-files/index.html" class="custom-button" id="segagenesis-btn">Sega Genesis Games
-<img src="icons/genesis.png" alt="Controller Icon" class="btn-icon"> 
+<img src="icons/genesis.png" alt="Controller Icon" class="btn-icon" id="genesis-icon"> 
 </a>
 
 <!-- Optional CSS to make it look like a real button -->
@@ -526,6 +526,48 @@ text-decoration: none;
 border-radius: 5px;
 border: none;
 cursor: pointer;
+}
+#genesis-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  opacity: 0.8;
+  transition: opacity 0.2s ease; /* Makes the fade smooth */
+}
+/* Core button styling */
+.custom-button#segagenesis-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+  padding: 10px 20px;
+  background-color: #00FFFF;
+  color: #000000;
+  text-decoration: none;
+  border-radius: 5px;
+  font-family: sans-serif;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* Target your new icon ID directly */
+#genesis-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  opacity: 0.8;
+  transition: opacity 0.2s ease; /* Makes the fade smooth */
+}
+
+/* Button Hover Effects */
+.custom-button:hover {
+  background-color: #818580;
+  color: #ffffff;
+}
+
+/* Brighten the specific icon when the button is hovered */
+.custom-button:hover #genesis-icon {
+  opacity: 1;
 }
 .custom-button:hover {
 background-color: #818580;
