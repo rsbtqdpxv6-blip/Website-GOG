@@ -701,6 +701,14 @@ background-color: #8B0000;
 }
 </style>
 
+<h3>Save and Load Progress on Website! (if you clear search history, if not then it will be saved automatically to localstorage)</h3>
+
+<button onclick="exportData()" style="font-family:inherit; font-size:14px; font-weight:500; padding:8px 16px; border-radius:6px; border:1px solid rgba(27,31,36,0.15); cursor:pointer; background-color:#0969da; color:#ffffff; margin:5px;">💾 Export Backup</button>
+
+<button onclick="document.getElementById('hiddenImportPicker').click()" style="font-family:inherit; font-size:14px; font-weight:500; padding:8px 16px; border-radius:6px; border:1px solid rgba(27,31,36,0.15); cursor:pointer; background-color:#f3f4f6; color:#24292f; margin:5px;">📂 Import Backup</button>
+<input type="file" id="hiddenImportPicker" accept=".json" onchange="importData(this)" style="display: none;">
+
+<script src="backup.js"></script>
 
 </body>
 </html>
