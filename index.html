@@ -551,6 +551,7 @@ cursor: pointer;
   outline: none;
   opacity: 1;
 }
+</style>
 <!-- HTML -->
 <a href="ruffle-files/index.html" class="custom-button" id="ruffle-btn">Flash Games</a>
 
@@ -574,7 +575,9 @@ background-color: #818581;
 
 </style>
 <!-- HTML -->
-<a href="gbc-files/index.html" class="custom-button" id="gb-btn">Game Boy and Game Boy Colour Games</a>
+<a href="gbc-files/index.html" class="custom-button" id="gb-btn">Game Boy and Game Boy Colour Games
+<img src="icons/gameboy.png" alt="Controller Icon" class="btn-icon" id="gb-icon">
+</a>
 
 <!-- Optional CSS to make it look like a real button -->
 <style>
@@ -591,6 +594,49 @@ cursor: pointer;
 }
 .custom-button:hover {
 background-color: #818582;
+}
+#gb-icon {
+  outline: none;
+  transform: scale(2.0);
+  float: right;
+  margin-right: 10px;
+  margin-left: 20px;
+  width: 20px;
+  height: 20px;
+  opacity: 0.8;
+  transition: opacity 0.2s ease; /* Makes the fade smooth */
+}
+
+/* Button Hover Effects */
+.custom-button:hover {
+  background-color: #818580;
+  color: #ffffff;
+}
+
+/* Brighten the specific icon when the button is hovered */
+.custom-button:hover #gb-icon {
+  outline: none;
+  opacity: 1;
+}
+</style>
+<!-- HTML -->
+<a href="ruffle-files/index.html" class="custom-button" id="ruffle-btn">Flash Games</a>
+
+<!-- Optional CSS to make it look like a real button -->
+<style>
+.custom-button#ruffle-btn {
+display: block;
+margin-bottom: 6px;
+padding: 10px 20px;
+background-color: #cbd1cc;
+color: white;
+text-decoration: none;
+border-radius: 5px;
+border: none;
+cursor: pointer;
+}
+.custom-button:hover {
+background-color: #818581;
 }
 </style>
 
