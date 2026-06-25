@@ -5,12 +5,11 @@
 #snes-play-btn {
   /* Aligns the text on the left and the icon on the right */
   display: block;                  
-  margin-bottom: 6px
+  margin-bottom: 6px;
   background-color: #cbd1cc;      
   color: white;
   padding: 10px 20px;
   font-size: 16px;
-  font-weight: bold;
   border: none;
   border-radius: 5px;
   cursor: pointer;
