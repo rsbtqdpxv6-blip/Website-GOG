@@ -1,0 +1,47 @@
+/* ==========================================================================
+   SUPER NINTENDO BUTTON STYLES
+   ========================================================================== */
+
+#snes-play-btn {
+  /* Aligns the text on the left and the icon on the right */
+  display: flex;                  
+  justify-content: space-between; 
+  align-items: center;            
+  
+  /* Your exact button spacing and styling */
+  margin-bottom: 6px;
+  background-color: #cbd1cc;      
+  color: white;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100%;                    /* Ensures full-width block behavior */
+}
+
+/* Removes the default browser click outline */
+#snes-play-btn:focus {
+  outline: none;
+}
+
+/* ==========================================================================
+   SNES ICON STYLES (Scale 2.0 & Overlap Fixes)
+   ========================================================================== */
+
+#snes-icon {
+  /* Base dimensions keep the button height perfectly thin */
+  width: 20px !important;         
+  height: 20px !important;
+  object-fit: contain;
+  
+  /* Magnifies the icon visually */
+  transform: scale(2.0);          
+  
+  /* THE OVERLAP FIX: Pushes the text safely away on the left side */
+  margin-left: 20px;              
+  
+  /* Keeps the right edge of the giant icon from hitting the button border */
+  margin-right: 10px;             
+}
