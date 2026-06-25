@@ -4,12 +4,8 @@
 
 #snes-play-btn {
   /* Aligns the text on the left and the icon on the right */
-  display: flex;                  
-  justify-content: space-between; 
-  align-items: center;            
-  
-  /* Your exact button spacing and styling */
-  margin-bottom: 6px;
+  display: block;                  
+  margin-bottom: 6px
   background-color: #cbd1cc;      
   color: white;
   padding: 10px 20px;
@@ -19,6 +15,11 @@
   border-radius: 5px;
   cursor: pointer;
   width: 100%;                    /* Ensures full-width block behavior */
+}
+
+.custom-button:hover #snes-icon {
+  outline: none;
+  opacity: 1;
 }
 
 /* Removes the default browser click outline */
@@ -32,8 +33,8 @@
 
 #snes-icon {
   /* Base dimensions keep the button height perfectly thin */
-  width: 20px !important;         
-  height: 20px !important;
+  width: 20px;         
+  height: 20px;
   object-fit: contain;
   
   /* Magnifies the icon visually */
@@ -44,4 +45,5 @@
   
   /* Keeps the right edge of the giant icon from hitting the button border */
   margin-right: 10px;             
+  opacity: 0.7
 }
