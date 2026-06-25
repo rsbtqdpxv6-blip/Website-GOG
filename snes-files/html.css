@@ -14,7 +14,6 @@
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  width: 100%;                    /* Ensures full-width block behavior */
 }
 
 .custom-button:hover #snes-icon {
@@ -36,6 +35,7 @@
   width: 20px;         
   height: 20px;
   object-fit: contain;
+  outline: none;
   
   /* Magnifies the icon visually */
   transform: scale(2.0);          
@@ -45,5 +45,5 @@
   
   /* Keeps the right edge of the giant icon from hitting the button border */
   margin-right: 10px;             
-  opacity: 0.7
+  opacity: 0.7;
 }
