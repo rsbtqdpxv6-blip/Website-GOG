@@ -1,15 +1,15 @@
 #snes-icon, #genesis-icon, #gb-icon {
-  width: 20px;         
-  height: 20px;
-  outline: none;
-  object-fit: contain;
-  opacity: 0.8;
+  width: 20px !important;         
+  height: 20px !important;
+  outline: none !important;
+  object-fit: contain !important;
+  opacity: 0.8 !important;
   
   /* 1. Keeps your layout size identical (doesn't push the button bigger) */
-  transform: scale(2.0);          
+  transform: scale(2.0) !important;
   
   /* 2. THE BLURRY FIX: Forces the browser to keep edges completely crisp */
-  image-rendering: pixelated;     /* Use 'crisp-edges' if 'pixelated' doesn't work in Safari */
+  image-rendering: pixelated !important;     /* Use 'crisp-edges' if 'pixelated' doesn't work in Safari */
 }
 
 #snes-play-btn {
