@@ -1,0 +1,184 @@
+
+#snes-play-btn {
+  /* Aligns the text on the left and the icon on the right */
+  display: block;                  
+  margin-bottom: 6px;
+  background-color: #cbd1cc;      
+  color: white;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.custom-button:hover #snes-icon {
+  outline: none;
+  opacity: 1;
+}
+
+/* Removes the default browser click outline */
+#snes-play-btn:focus {
+  outline: none;
+}
+
+#snes-icon {
+  /* Base dimensions keep the button height perfectly thin */
+  width: 20px;         
+  height: 20px;
+  object-fit: contain;
+  outline: none;
+  
+  /* Magnifies the icon visually */
+  transform: scale(2.0);          
+  
+  /* THE OVERLAP FIX: Pushes the text safely away on the left side */
+  margin-left: 20px;              
+  
+  /* Keeps the right edge of the giant icon from hitting the button border */
+  margin-right: 10px;             
+  opacity: 0.7;
+}
+
+.custom-button#gb-btn {
+display: block;
+margin-bottom: 6px;
+padding: 10px 20px;
+background-color: #dae0dc;
+color: white;
+text-decoration: none;
+border-radius: 5px;
+border: none;
+cursor: pointer;
+}
+.custom-button:hover {
+background-color: #939494;
+}
+#gb-icon {
+  outline: none;
+  transform: scale(2.0);
+  float: right;
+  margin-right: 10px;
+  margin-left: 20px;
+  width: 20px;
+  height: 20px;
+  opacity: 0.8;
+  transition: opacity 0.2s ease; /* Makes the fade smooth */
+}
+
+/* Brighten the specific icon when the button is hovered */
+.custom-button:hover #gb-icon {
+  outline: none;
+  opacity: 1;
+}
+
+.custom-button#segagenesis-btn {
+display: block;
+margin-bottom: 6px;
+padding: 10px 20px;
+background-color: #00FFFF;
+color: white;
+text-decoration: none;
+border-radius: 5px;
+border: none;
+cursor: pointer;
+}
+/* Target your new icon ID directly */
+#genesis-icon {
+  outline: none;
+  transform: scale(2.0);
+  float: right;
+  margin-right: 10px;
+  margin-left: 20px;
+  width: 20px;
+  height: 20px;
+  opacity: 0.8;
+  transition: opacity 0.2s ease; /* Makes the fade smooth */
+}
+
+/* Button Hover Effects */
+.custom-button:hover {
+  background-color: #818580;
+  color: #ffffff;
+}
+
+/* Brighten the specific icon when the button is hovered */
+.custom-button:hover #genesis-icon {
+  outline: none;
+  opacity: 1;
+}
+
+.custom-button#ruffle-btn {
+display: block;
+margin-bottom: 6px;
+padding: 10px 20px;
+background-color: #cbd1cc;
+color: white;
+text-decoration: none;
+border-radius: 5px;
+border: none;
+cursor: pointer;
+}
+.custom-button:hover {
+background-color: #818581;
+}
+
+.custom-button#n64-btn {
+display: block;
+margin-bottom: 6px;
+padding: 10px 20px;
+background-color: #dae1dc;
+color: white;
+text-decoration: none;
+border-radius: 5px;
+border: none;
+cursor: pointer;
+}
+.custom-button:hover {
+background-color: #818583;
+}
+
+.custom-button#nds-btn {
+display: block;
+margin-bottom: 6px;
+padding: 10px 20px;
+background-color: #dae2dc ;
+color: white;
+text-decoration: none;
+border-radius: 5px;
+border: none;
+cursor: pointer;
+}
+.custom-button:hover {
+background-color: #818584;
+}
+
+.custom-button#regular-btn {
+display: block;
+margin-bottom: 6px;
+padding: 10px 20px;
+background-color: #dae3dc;
+color: white;
+text-decoration: none;
+border-radius: 5px;
+border: none;
+cursor: pointer;
+}
+.custom-button:hover {
+background-color: #818585;
+}
+
+.custom-button#license-btn {
+display: block;
+margin-bottom: 6px;
+padding: 10px 20px;
+background-color: #FF0000;
+color: white;
+text-decoration: none;
+border-radius: 5px;
+border: none;
+cursor: pointer;
+}
+.custom-button:hover#license-btn {
+background-color: #8B0000;
+}
